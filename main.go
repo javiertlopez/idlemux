@@ -18,6 +18,7 @@ func main() {
 
 	// Pass the router to set up handlers
 	addAppHandler(router)
+	addVideoHandler(router)
 
 	// Create a Server instance with the router
 	srv := &http.Server{
