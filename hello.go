@@ -15,7 +15,7 @@ func addAppHandler(r *mux.Router) {
 func HelloHandler(w http.ResponseWriter, r *http.Request) {
 	JSONResponse(
 		w,
-		http.StatusCreated,
+		http.StatusOK,
 		Response{
 			Message: "Hello World!",
 			Status:  http.StatusOK,
