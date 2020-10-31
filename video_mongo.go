@@ -106,8 +106,11 @@ func (v video) toModel() *Video {
 		ID:          &v.ID,
 		Title:       v.Title,
 		Description: v.Description,
-		Duration:    v.Duration,
-		CreatedAt:   v.CreatedAt.String(),
-		UpdatedAt:   v.UpdatedAt.String(),
+		Asset: &Asset{
+			ID: v.AssetID,
+		},
+		Duration:  v.Duration,
+		CreatedAt: v.CreatedAt.String(),
+		UpdatedAt: v.UpdatedAt.String(),
 	}
 }
