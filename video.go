@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -25,12 +24,12 @@ type Video struct {
 }
 
 // addVideoHandler adds the handler to the mux router
-func addVideoHandler(r *mux.Router) {
-	r.HandleFunc("/videos", CreateVideoHandler).Methods("POST")
+func (a *App) addVideoHandler(r *mux.Router) {
+	r.HandleFunc("/videos", a.CreateVideoHandler).Methods("POST")
 }
 
 // CreateVideoHandler handler
-func CreateVideoHandler(w http.ResponseWriter, r *http.Request) {
+func (a *App) CreateVideoHandler(w http.ResponseWriter, r *http.Request) {
 	var video Video
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&video); err != nil {
@@ -45,7 +44,19 @@ func CreateVideoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	err := fmt.Errorf("handler not implemented")
+	// Title and Description are mandatory fields
+	if len(video.Title) == 0 || len(video.Description) == 0 {
+		JSONResponse(
+			w, http.StatusUnprocessableEntity,
+			Response{
+				Message: "Unprocessable Entity",
+				Status:  http.StatusUnprocessableEntity,
+			},
+		)
+		return
+	}
+
+	response, err := a.videos.Insert(r.Context(), &video)
 
 	if err != nil {
 		JSONResponse(
@@ -62,6 +73,6 @@ func CreateVideoHandler(w http.ResponseWriter, r *http.Request) {
 	JSONResponse(
 		w,
 		http.StatusCreated,
-		video,
+		response,
 	)
 }
