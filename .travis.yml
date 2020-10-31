@@ -4,7 +4,7 @@ go:
   - 1.15.x
 
 before_install:
-  - go get 
+  - go get github.com/javiertlopez/awesome/api
 
 script:
   - go test -v ./api -race -coverprofile=coverage.txt -covermode=atomic
