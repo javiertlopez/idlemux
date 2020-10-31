@@ -1,9 +1,10 @@
-package main
+package asset
 
 import (
 	"context"
 	"fmt"
 
+	awesome "github.com/javiertlopez/awesome/pkg"
 	muxgo "github.com/muxinc/mux-go"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
@@ -23,7 +24,7 @@ type asset struct {
 func NewAssetService(
 	l *logrus.Logger,
 	m *muxgo.APIClient,
-) Assets {
+) awesome.Assets {
 	return &assets{
 		logger: l,
 		mux:    m,
@@ -53,7 +54,7 @@ func (a *assets) Ingest(ctx context.Context, source string) (string, error) {
 	return asset.Data.Id, nil
 }
 
-func (a *assets) GetByID(ctx context.Context, id string) (*Asset, error) {
+func (a *assets) GetByID(ctx context.Context, id string) (*awesome.Asset, error) {
 	response, err := a.mux.AssetsApi.GetAsset(id)
 
 	if err != nil {
@@ -67,8 +68,8 @@ func (a *assets) GetByID(ctx context.Context, id string) (*Asset, error) {
 	return body.toModel(), nil
 }
 
-func (a *asset) toModel() *Asset {
-	response := &Asset{
+func (a *asset) toModel() *awesome.Asset {
+	response := &awesome.Asset{
 		ID:                  a.data.Id,
 		CreatedAt:           a.data.CreatedAt,
 		Status:              a.data.Status,
@@ -98,8 +99,8 @@ func (a *asset) toModel() *Asset {
 			"7",
 		)
 
-		response.Sources = []Source{
-			Source{
+		response.Sources = []awesome.Source{
+			awesome.Source{
 				ID: playbackID,
 				Source: fmt.Sprintf(
 					"https://stream.mux.com/%s.m3u8",

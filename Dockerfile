@@ -21,7 +21,8 @@ RUN adduser \
 WORKDIR $GOPATH/src/github.com/javiertlopez/awesome/
 COPY . .
 
-RUN go get && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /go/bin/main
+RUN go get github.com/javiertlopez/awesome/api
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /go/bin/main ./api
 
 # Small image
 FROM scratch

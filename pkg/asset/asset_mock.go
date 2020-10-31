@@ -1,8 +1,9 @@
-package main
+package asset
 
 import (
 	"context"
 
+	awesome "github.com/javiertlopez/awesome/pkg"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -16,18 +17,18 @@ func (m *MockedAssets) Ingest(ctx context.Context, source string) (string, error
 	case ValidURL:
 		return "5iNFJg9dIww2AgUryhgghbP00Dc4ogoxn00gzitOdjICg", nil
 	}
-	return "", ErrIngestionFailed
+	return "", awesome.ErrIngestionFailed
 }
 
-func (m *MockedAssets) GetByID(ctx context.Context, id string) (*Asset, error) {
+func (m *MockedAssets) GetByID(ctx context.Context, id string) (*awesome.Asset, error) {
 	ID := "5iNFJg9dIww2AgUryhgghbP00Dc4ogoxn00gzitOdjICg"
 
 	switch id {
 	case ID:
-		return &Asset{
+		return &awesome.Asset{
 			ID: ID,
 		}, nil
 	}
 
-	return nil, ErrAssetNotFound
+	return nil, awesome.ErrAssetNotFound
 }

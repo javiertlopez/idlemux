@@ -1,30 +1,12 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	awesome "github.com/javiertlopez/awesome/pkg"
 )
-
-// Videos interface, for testing purposes
-type Videos interface {
-	Insert(ctx context.Context, anyVideo *Video) (*Video, error)
-	GetByID(ctx context.Context, id string) (*Video, error)
-}
-
-// Video struct
-type Video struct {
-	ID          *string  `json:"id,omitempty"`
-	Title       string   `json:"title,omitempty"`
-	Description string   `json:"description,omitempty"`
-	SourceURL   string   `json:"source_url,omitempty"`
-	Asset       *Asset   `json:"asset,omitempty"`
-	Duration    *float64 `json:"duration,omitempty"`
-	CreatedAt   string   `json:"created_at,omitempty"`
-	UpdatedAt   string   `json:"updated_at,omitempty"`
-}
 
 // addVideoHandler adds the handler to the mux router
 func (a *App) addVideoHandler(r *mux.Router) {
@@ -34,7 +16,7 @@ func (a *App) addVideoHandler(r *mux.Router) {
 
 // CreateVideoHandler handler
 func (a *App) CreateVideoHandler(w http.ResponseWriter, r *http.Request) {
-	var video Video
+	var video awesome.Video
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&video); err != nil {
 		JSONResponse(
@@ -64,7 +46,7 @@ func (a *App) CreateVideoHandler(w http.ResponseWriter, r *http.Request) {
 	if len(video.SourceURL) > 0 {
 		assetID, err := a.assets.Ingest(r.Context(), video.SourceURL)
 		if err == nil {
-			video.Asset = &Asset{
+			video.Asset = &awesome.Asset{
 				ID: assetID,
 			}
 		}
@@ -112,7 +94,7 @@ func (a *App) ReadVideoHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		// Look for Custom Error
-		if err == ErrVideoNotFound {
+		if err == awesome.ErrVideoNotFound {
 			JSONResponse(
 				w, http.StatusNotFound,
 				Response{

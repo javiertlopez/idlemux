@@ -1,10 +1,11 @@
-package main
+package video
 
 import (
 	"context"
 	"time"
 
 	guuid "github.com/google/uuid"
+	awesome "github.com/javiertlopez/awesome/pkg"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
@@ -32,7 +33,7 @@ type videos struct {
 func NewVideoService(
 	l *logrus.Logger,
 	m *mongo.Client,
-) Videos {
+) awesome.Videos {
 	return &videos{
 		logger: l,
 		mongo:  m,
@@ -40,7 +41,7 @@ func NewVideoService(
 }
 
 // Insert video creates a new ID, stores the video and returns the new object
-func (v *videos) Insert(ctx context.Context, anyVideo *Video) (*Video, error) {
+func (v *videos) Insert(ctx context.Context, anyVideo *awesome.Video) (*awesome.Video, error) {
 	collection := v.mongo.Database("awesome").Collection("videos")
 	time := time.Now()
 
@@ -73,7 +74,7 @@ func (v *videos) Insert(ctx context.Context, anyVideo *Video) (*Video, error) {
 }
 
 // GetByID retrieves a video with the ID
-func (v *videos) GetByID(ctx context.Context, id string) (*Video, error) {
+func (v *videos) GetByID(ctx context.Context, id string) (*awesome.Video, error) {
 	var response video
 
 	collection := v.mongo.Database("awesome").Collection("videos")
@@ -90,7 +91,7 @@ func (v *videos) GetByID(ctx context.Context, id string) (*Video, error) {
 		}).Error(err.Error())
 
 		if err == mongo.ErrNoDocuments {
-			return nil, ErrVideoNotFound
+			return nil, awesome.ErrVideoNotFound
 		}
 
 		return nil, err
@@ -101,12 +102,12 @@ func (v *videos) GetByID(ctx context.Context, id string) (*Video, error) {
 	return anyVideo, nil
 }
 
-func (v video) toModel() *Video {
-	return &Video{
+func (v video) toModel() *awesome.Video {
+	return &awesome.Video{
 		ID:          &v.ID,
 		Title:       v.Title,
 		Description: v.Description,
-		Asset: &Asset{
+		Asset: &awesome.Asset{
 			ID: v.AssetID,
 		},
 		Duration:  v.Duration,

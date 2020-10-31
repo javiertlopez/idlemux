@@ -6,6 +6,9 @@ import (
 	"os"
 	"time"
 
+	awesome "github.com/javiertlopez/awesome/pkg"
+	"github.com/javiertlopez/awesome/pkg/asset"
+	"github.com/javiertlopez/awesome/pkg/video"
 	muxgo "github.com/muxinc/mux-go"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -15,8 +18,8 @@ import (
 // App holds the Video service (seems okay)
 type App struct {
 	logger *logrus.Logger
-	assets Assets
-	videos Videos
+	assets awesome.Assets
+	videos awesome.Videos
 }
 
 func main() {
@@ -49,20 +52,20 @@ func main() {
 	)
 
 	// Create an app instance
-	awesome := &App{
+	awesomeApp := &App{
 		logger: logger,
-		assets: NewAssetService(
+		assets: asset.NewAssetService(
 			logger,
 			muxClient,
 		),
-		videos: NewVideoService(
+		videos: video.NewVideoService(
 			logger,
 			mongoClient,
 		),
 	}
 
 	// Create a Gorilla Mux router
-	router := awesome.Router()
+	router := awesomeApp.Router()
 
 	// Create a Server instance with the router
 	srv := &http.Server{

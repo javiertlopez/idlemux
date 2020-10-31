@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -10,94 +9,50 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	awesome "github.com/javiertlopez/awesome/pkg"
+	"github.com/javiertlopez/awesome/pkg/asset"
+	"github.com/javiertlopez/awesome/pkg/video"
+
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/mock"
 )
-
-type MockedVideos struct {
-	mock.Mock
-}
-
-func (m *MockedVideos) Insert(ctx context.Context, anyVideo *Video) (*Video, error) {
-	uuid := "fcdf5f4e-b086-4b52-8714-bf3623186185"
-
-	response := &Video{
-		ID:          &uuid,
-		Title:       anyVideo.Title,
-		Description: anyVideo.Description,
-	}
-
-	if anyVideo.Asset != nil {
-		response.Asset = &Asset{
-			ID: anyVideo.Asset.ID,
-		}
-	}
-
-	return response, nil
-}
-
-func (m *MockedVideos) GetByID(ctx context.Context, id string) (*Video, error) {
-	ID := "fcdf5f4e-b086-4b52-8714-bf3623186185"
-	IDWithSourceFile := "a9200233-9b62-489c-9cbc-bb37f2922804"
-
-	switch id {
-	case ID:
-		return &Video{
-			ID:          &ID,
-			Title:       "Some Might Say",
-			Description: "Oasis song from (What's the Story) Morning Glory? album.",
-		}, nil
-	case IDWithSourceFile:
-		return &Video{
-			ID:          &ID,
-			Title:       "Some Might Say",
-			Description: "Oasis song from (What's the Story) Morning Glory? album.",
-			Asset: &Asset{
-				ID: "5iNFJg9dIww2AgUryhgghbP00Dc4ogoxn00gzitOdjICg",
-			},
-		}, nil
-	}
-
-	return nil, ErrVideoNotFound
-}
 
 func TestCreateVideoHandler(t *testing.T) {
 	logger := logrus.New()
 	logger.Out = ioutil.Discard
 
-	completeVideo := &Video{
+	completeVideo := &awesome.Video{
 		Title:       "Some Might Say",
 		Description: "Oasis song from (What's the Story) Morning Glory? album.",
 		SourceURL:   "https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4",
 	}
 
-	incompleteVideo := &Video{
+	incompleteVideo := &awesome.Video{
 		Title:       "Some Might Say",
 		Description: "Oasis song from (What's the Story) Morning Glory? album.",
 	}
 
-	invalidVideo := &Video{
+	invalidVideo := &awesome.Video{
 		Title:       "Some Might Say",
 		Description: "Oasis song from (What's the Story) Morning Glory? album.",
 		SourceURL:   "invalidURL",
 	}
 
-	titleVideo := &Video{
+	titleVideo := &awesome.Video{
 		Title: "Some Might Say",
 	}
 
-	descriptionVideo := &Video{
+	descriptionVideo := &awesome.Video{
 		Description: "Oasis song from (What's the Story) Morning Glory? album.",
 	}
 
-	emptyVideo := &Video{}
+	emptyVideo := &awesome.Video{}
 
-	mockedVideos := new(MockedVideos)
-	mockedAssets := new(MockedAssets)
+	mockedVideos := new(video.MockedVideos)
+	mockedAssets := new(asset.MockedAssets)
 
 	// Create an app
-	awesome := App{
+	awesomeApp := App{
 		logger: logger,
 		videos: mockedVideos,
 		assets: mockedAssets,
@@ -112,7 +67,7 @@ func TestCreateVideoHandler(t *testing.T) {
 		name         string
 		expectedCode int
 		expectedBody string
-		body         *Video
+		body         *awesome.Video
 	}{
 		{"Valid", http.StatusCreated, expectedComplete, completeVideo},
 		{"Valid (with source file)", http.StatusCreated, expectedIncomplete, incompleteVideo},
@@ -134,7 +89,7 @@ func TestCreateVideoHandler(t *testing.T) {
 
 			// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
 			rr := httptest.NewRecorder()
-			handler := http.HandlerFunc(awesome.CreateVideoHandler)
+			handler := http.HandlerFunc(awesomeApp.CreateVideoHandler)
 
 			// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
 			// directly and pass in our Request and ResponseRecorder.
@@ -184,7 +139,7 @@ func TestCreateVideoHandler(t *testing.T) {
 
 		// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(awesome.CreateVideoHandler)
+		handler := http.HandlerFunc(awesomeApp.CreateVideoHandler)
 
 		// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
 		// directly and pass in our Request and ResponseRecorder.
@@ -228,11 +183,11 @@ func TestReadVideoHandler(t *testing.T) {
 	ID := "fcdf5f4e-b086-4b52-8714-bf3623186185"
 	IDWithSourceFile := "a9200233-9b62-489c-9cbc-bb37f2922804"
 
-	mockedVideos := new(MockedVideos)
-	mockedAssets := new(MockedAssets)
+	mockedVideos := new(video.MockedVideos)
+	mockedAssets := new(asset.MockedAssets)
 
 	// Create an app
-	awesome := App{
+	awesomeApp := App{
 		logger: logger,
 		videos: mockedVideos,
 		assets: mockedAssets,
@@ -267,7 +222,7 @@ func TestReadVideoHandler(t *testing.T) {
 			rr := httptest.NewRecorder()
 
 			router := mux.NewRouter()
-			router.HandleFunc("/videos/{id}", awesome.ReadVideoHandler)
+			router.HandleFunc("/videos/{id}", awesomeApp.ReadVideoHandler)
 
 			// Change to Gorilla Mux router to pass variables
 			router.ServeHTTP(rr, req)
