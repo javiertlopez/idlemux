@@ -31,6 +31,8 @@ func NewAssetService(
 	}
 }
 
+// Ingest send a source file url to mux.com
+// Returns a string Asset ID
 func (a *assets) Ingest(ctx context.Context, source string) (string, error) {
 	asset, err := a.mux.AssetsApi.CreateAsset(muxgo.CreateAssetRequest{
 		Input: []muxgo.InputSettings{
@@ -54,6 +56,7 @@ func (a *assets) Ingest(ctx context.Context, source string) (string, error) {
 	return asset.Data.Id, nil
 }
 
+// GetByID retrieves an asset from Mux.com by Asset ID
 func (a *assets) GetByID(ctx context.Context, id string) (*awesome.Asset, error) {
 	response, err := a.mux.AssetsApi.GetAsset(id)
 

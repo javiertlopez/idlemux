@@ -20,7 +20,7 @@ For testing
 Install dependencies:
 
 ```bash
-go get
+go get github.com/javiertlopez/awesome/api 
 ```
 
 ### From Terminal
@@ -28,7 +28,7 @@ go get
 Export environment environment variable with **Mongo Atlas Connection String** and **Mux credentials**:
 
 ```bash
-export MONGO_STRING=connectionString
+export MONGO_STRING="connectionString"
 export MUX_TOKEN_ID=muxTokenID
 export MUX_TOKEN_SECRET=muxTokenSecret
 ```
@@ -36,7 +36,7 @@ export MUX_TOKEN_SECRET=muxTokenSecret
 Run app directly from terminal:
 
 ```bash
-go run .
+go run ./api
 ```
 
 ### From Visual Studio
