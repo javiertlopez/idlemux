@@ -54,7 +54,7 @@ func (m *MockedVideos) GetByID(ctx context.Context, id string) (*Video, error) {
 			Title:       "Some Might Say",
 			Description: "Oasis song from (What's the Story) Morning Glory? album.",
 			Asset: &Asset{
-				ID: IDWithSourceFile,
+				ID: "5iNFJg9dIww2AgUryhgghbP00Dc4ogoxn00gzitOdjICg",
 			},
 		}, nil
 	}
