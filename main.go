@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 )
 
@@ -19,12 +18,13 @@ func main() {
 	logger := logrus.New()
 	logger.Formatter = &logrus.JSONFormatter{}
 
-	// Create a Gorilla Mux router
-	router := mux.NewRouter()
+	// Create an app instance
+	awesome := &App{
+		logger: logger,
+	}
 
-	// Pass the router to set up handlers
-	addAppHandler(router)
-	addVideoHandler(router)
+	// Create a Gorilla Mux router
+	router := awesome.Router()
 
 	// Create a Server instance with the router
 	srv := &http.Server{
