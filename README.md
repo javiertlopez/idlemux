@@ -98,7 +98,14 @@ curl --location --request POST 'http://127.0.0.1:8080/videos' \
 
 Response:
 ```json
-{"id":"81095f2d-76d9-4b7b-a3d8-727aa90617c3","title":"Don't Look Back In Anger","description":"Oasis song from (What's the Story) Morning Glory? album.","asset":{},"created_at":"2020-10-31 20:05:40.127259884 +0000 UTC m=+317.213044791","updated_at":"2020-10-31 20:05:40.127259884 +0000 UTC m=+317.213044791"}
+{
+    "id": "81095f2d-76d9-4b7b-a3d8-727aa90617c3",
+    "title": "Don't Look Back In Anger",
+    "description": "Oasis song from (What's the Story) Morning Glory? album.",
+    "asset": {},
+    "created_at": "2020-10-31 20:05:40.127259884 +0000 UTC m=+317.213044791",
+    "updated_at": "2020-10-31 20:05:40.127259884 +0000 UTC m=+317.213044791"
+}
 ```
 
 **Example 2.** Video with a source file:
@@ -116,7 +123,16 @@ curl --location --request POST 'http://127.0.0.1:8080/videos' \
 
 Response:
 ```json
-{"id":"50035c43-c1f9-4ff3-beb2-783f145a8dfe","title":"Wonderwall","description":"Oasis song from (What's the Story) Morning Glory? album.","asset":{"id":"zQJ4DsW01QbbBl2Rd3801bUgpWmQD01j5eUOytzjv8QF02c"},"created_at":"2020-10-31 20:07:08.759255341 +0000 UTC m=+405.845420795","updated_at":"2020-10-31 20:07:08.759255341 +0000 UTC m=+405.845420795"}
+{
+    "id": "50035c43-c1f9-4ff3-beb2-783f145a8dfe",
+    "title": "Wonderwall",
+    "description": "Oasis song from (What's the Story) Morning Glory? album.",
+    "asset": {
+        "id": "zQJ4DsW01QbbBl2Rd3801bUgpWmQD01j5eUOytzjv8QF02c"
+    },
+    "created_at": "2020-10-31 20:07:08.759255341 +0000 UTC m=+405.845420795",
+    "updated_at": "2020-10-31 20:07:08.759255341 +0000 UTC m=+405.845420795"
+}
 ```
 
 
@@ -131,7 +147,14 @@ curl --location --request GET 'http://127.0.0.1:8080/videos/81095f2d-76d9-4b7b-a
 
 Response:
 ```json
-{"id":"81095f2d-76d9-4b7b-a3d8-727aa90617c3","title":"Don't Look Back In Anger","description":"Oasis song from (What's the Story) Morning Glory? album.","asset":{},"created_at":"2020-10-31 20:05:40.127 +0000 UTC","updated_at":"2020-10-31 20:05:40.127 +0000 UTC"}
+{
+    "id": "81095f2d-76d9-4b7b-a3d8-727aa90617c3",
+    "title": "Don't Look Back In Anger",
+    "description": "Oasis song from (What's the Story) Morning Glory? album.",
+    "asset": {},
+    "created_at": "2020-10-31 20:05:40.127 +0000 UTC",
+    "updated_at": "2020-10-31 20:05:40.127 +0000 UTC"
+}
 ```
 
 **Example 2.** Video with a source file:
@@ -143,5 +166,30 @@ curl --location --request GET 'http://127.0.0.1:8080/videos/50035c43-c1f9-4ff3-b
 
 Response:
 ```json
-{"id":"50035c43-c1f9-4ff3-beb2-783f145a8dfe","title":"Wonderwall","description":"Oasis song from (What's the Story) Morning Glory? album.","asset":{"id":"zQJ4DsW01QbbBl2Rd3801bUgpWmQD01j5eUOytzjv8QF02c","created_at":"1604174828","status":"ready","duration":23.857167,"max_stored_resolution":"HD","max_stored_frame_rate":29.97,"aspect_ratio":"16:9","poster":"https://image.mux.com/7hDIO2xL101KjoSrQy018NtTI02XhXQOGLbJcHVLC00YAig/thumbnail.png?width=1920\u0026height=1080\u0026smart_crop=true\u0026time=7","thumbnail":"https://image.mux.com/7hDIO2xL101KjoSrQy018NtTI02XhXQOGLbJcHVLC00YAig/thumbnail.png?width=640\u0026height=360\u0026smart_crop=true\u0026time=7","sources":[{"id":"7hDIO2xL101KjoSrQy018NtTI02XhXQOGLbJcHVLC00YAig","policy":"","src":"https://stream.mux.com/7hDIO2xL101KjoSrQy018NtTI02XhXQOGLbJcHVLC00YAig.m3u8","type":"application/x-mpegURL"}]},"created_at":"2020-10-31 20:07:08.759 +0000 UTC","updated_at":"2020-10-31 20:07:08.759 +0000 UTC"}
+{
+    "id": "50035c43-c1f9-4ff3-beb2-783f145a8dfe",
+    "title": "Wonderwall",
+    "description": "Oasis song from (What's the Story) Morning Glory? album.",
+    "asset": {
+        "id": "zQJ4DsW01QbbBl2Rd3801bUgpWmQD01j5eUOytzjv8QF02c",
+        "created_at": "1604174828",
+        "status": "ready",
+        "duration": 23.857167,
+        "max_stored_resolution": "HD",
+        "max_stored_frame_rate": 29.97,
+        "aspect_ratio": "16:9",
+        "poster": "https://image.mux.com/7hDIO2xL101KjoSrQy018NtTI02XhXQOGLbJcHVLC00YAig/thumbnail.png?width=1920\u0026height=1080\u0026smart_crop=true\u0026time=7",
+        "thumbnail": "https://image.mux.com/7hDIO2xL101KjoSrQy018NtTI02XhXQOGLbJcHVLC00YAig/thumbnail.png?width=640\u0026height=360\u0026smart_crop=true\u0026time=7",
+        "sources": [
+            {
+                "id": "7hDIO2xL101KjoSrQy018NtTI02XhXQOGLbJcHVLC00YAig",
+                "policy": "",
+                "src": "https://stream.mux.com/7hDIO2xL101KjoSrQy018NtTI02XhXQOGLbJcHVLC00YAig.m3u8",
+                "type": "application/x-mpegURL"
+            }
+        ]
+    },
+    "created_at": "2020-10-31 20:07:08.759 +0000 UTC",
+    "updated_at": "2020-10-31 20:07:08.759 +0000 UTC"
+}
 ```
