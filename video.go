@@ -11,6 +11,7 @@ import (
 // Videos interface, for testing purposes
 type Videos interface {
 	Insert(ctx context.Context, anyVideo *Video) (*Video, error)
+	GetByID(ctx context.Context, id string) (*Video, error)
 }
 
 // Video struct
@@ -26,6 +27,7 @@ type Video struct {
 // addVideoHandler adds the handler to the mux router
 func (a *App) addVideoHandler(r *mux.Router) {
 	r.HandleFunc("/videos", a.CreateVideoHandler).Methods("POST")
+	r.HandleFunc("/videos/{id}", a.ReadVideoHandler).Methods("GET")
 }
 
 // CreateVideoHandler handler
@@ -73,6 +75,56 @@ func (a *App) CreateVideoHandler(w http.ResponseWriter, r *http.Request) {
 	JSONResponse(
 		w,
 		http.StatusCreated,
+		response,
+	)
+}
+
+// ReadVideoHandler handler
+func (a *App) ReadVideoHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	// Wrong type of ID should return 422 error?
+	if len(id) != 36 {
+		JSONResponse(
+			w, http.StatusUnprocessableEntity,
+			Response{
+				Message: "Unprocessable Entity",
+				Status:  http.StatusUnprocessableEntity,
+			},
+		)
+		return
+	}
+
+	response, err := a.videos.GetByID(r.Context(), id)
+
+	if err != nil {
+		// Look for Custom Error
+		if err == ErrVideoNotFound {
+			JSONResponse(
+				w, http.StatusNotFound,
+				Response{
+					Message: err.Error(),
+					Status:  http.StatusNotFound,
+				},
+			)
+			return
+		}
+
+		// Anything besides Not Found should be return as an internal error
+		JSONResponse(
+			w, http.StatusInternalServerError,
+			Response{
+				Message: err.Error(),
+				Status:  http.StatusInternalServerError,
+			},
+		)
+		return
+	}
+
+	JSONResponse(
+		w,
+		http.StatusOK,
 		response,
 	)
 }
