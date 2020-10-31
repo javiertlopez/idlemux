@@ -8,6 +8,12 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// App holds the Video service (seems okay)
+type App struct {
+	logger *logrus.Logger
+	videos Videos
+}
+
 func main() {
 	// Create a logrus logger and set up the output format as JSON
 	logger := logrus.New()
