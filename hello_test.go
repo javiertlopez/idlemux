@@ -1,12 +1,23 @@
 package main
 
 import (
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/sirupsen/logrus"
 )
 
 func TestHelloHandler(t *testing.T) {
+	logger := logrus.New()
+	logger.Out = ioutil.Discard
+
+	// Create an app
+	awesome := App{
+		logger: logger,
+	}
+
 	// Create a request to pass to our handler.
 	req, err := http.NewRequest("GET", "/app/health", nil)
 	if err != nil {
@@ -15,7 +26,7 @@ func TestHelloHandler(t *testing.T) {
 
 	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(HelloHandler)
+	handler := http.HandlerFunc(awesome.HelloHandler)
 
 	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
 	// directly and pass in our Request and ResponseRecorder.
