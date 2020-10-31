@@ -61,10 +61,6 @@ func (v *videos) Insert(ctx context.Context, anyVideo *Video) (*Video, error) {
 			"uuid": uuid,
 		}).Error(err.Error())
 
-		if err == mongo.ErrNoDocuments {
-			return nil, ErrVideoNotFound
-		}
-
 		return nil, err
 	}
 
@@ -89,6 +85,11 @@ func (v *videos) GetByID(ctx context.Context, id string) (*Video, error) {
 			"func": "func (v *videos) GetByID",
 			"id":   id,
 		}).Error(err.Error())
+
+		if err == mongo.ErrNoDocuments {
+			return nil, ErrVideoNotFound
+		}
+
 		return nil, err
 	}
 
