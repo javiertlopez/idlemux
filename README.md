@@ -1,13 +1,14 @@
 # awesome [![Build Status](https://travis-ci.com/javiertlopez/awesome.svg?token=pyy6Hs7N6KLZpHXbFbXd&branch=main)](https://travis-ci.com/javiertlopez/awesome) [![codecov](https://codecov.io/gh/javiertlopez/awesome/branch/main/graph/badge.svg?token=I8D2Z4TZX4)](undefined)
 
 ## Overview
-Awesome is a REST API that stores a Video Library in Mongo Atlas.
+Awesome is a REST API that stores a Video Library in Mongo Atlas and Mux.com for video ingestion.
 
 ## Dependencies
 
 - Go 1.15.3
 - github.com/google/uuid v1.1.2
 - github.com/gorilla/mux v1.8.0
+- github.com/muxinc/mux-go v0.9.0
 - github.com/sirupsen/logrus v1.7.0
 - go.mongodb.org/mongo-driver v1.4.2
 
@@ -24,10 +25,12 @@ go get
 
 ### From Terminal
 
-Export environment environment variable with **Mongo Atlas Connection String**:
+Export environment environment variable with **Mongo Atlas Connection String** and **Mux credentials**:
 
 ```bash
 export MONGO_STRING=connectionString
+export MUX_TOKEN_ID=muxTokenID
+export MUX_TOKEN_SECRET=muxTokenSecret
 ```
 
 Run app directly from terminal:
