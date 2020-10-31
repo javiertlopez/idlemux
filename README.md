@@ -42,3 +42,19 @@ go run .
 ### From Visual Studio
 
 The project is setup to run directly from Visual Studio Run tab. Just fill the credentials, and rename the file from `dev.env.example` to `dev.env`.
+
+## Docker
+
+Create a docker image
+
+```bash
+docker build -t javiertlopez/awesome-api .
+```
+
+Run the docker container
+
+```bash
+docker run --env-file=dev.env -d -p 8080:8080 javiertlopez/awesome-api
+```
+
+**Note.** It is required to fill the `dev.env` file.
