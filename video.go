@@ -1,12 +1,18 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
 )
+
+// Videos interface, for testing purposes
+type Videos interface {
+	Insert(ctx context.Context, anyVideo *Video) (*Video, error)
+}
 
 // Video struct
 type Video struct {
