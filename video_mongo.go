@@ -17,6 +17,7 @@ type video struct {
 	Title       string    `bson:"title"`
 	Description string    `bson:"description"`
 	Duration    *float64  `bson:"duration,omitempty"`
+	AssetID     string    `bson:"asset_id,omitempty"`
 	CreatedAt   time.Time `bson:"createdAt"`
 	UpdatedAt   time.Time `bson:"updatedAt"`
 }
@@ -53,6 +54,10 @@ func (v *videos) Insert(ctx context.Context, anyVideo *Video) (*Video, error) {
 		UpdatedAt:   time,
 	}
 
+	if anyVideo.Asset != nil {
+		insert.AssetID = anyVideo.Asset.ID
+	}
+
 	_, err := collection.InsertOne(ctx, insert)
 	if err != nil {
 		v.logger.WithFields(log.Fields{
@@ -64,9 +69,7 @@ func (v *videos) Insert(ctx context.Context, anyVideo *Video) (*Video, error) {
 		return nil, err
 	}
 
-	anyVideo.ID = &uuid
-
-	return anyVideo, nil
+	return insert.toModel(), nil
 }
 
 // GetByID retrieves a video with the ID

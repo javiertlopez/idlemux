@@ -22,12 +22,24 @@ type MockedVideos struct {
 func (m *MockedVideos) Insert(ctx context.Context, anyVideo *Video) (*Video, error) {
 	uuid := "fcdf5f4e-b086-4b52-8714-bf3623186185"
 
-	anyVideo.ID = &uuid
-	return anyVideo, nil
+	response := &Video{
+		ID:          &uuid,
+		Title:       anyVideo.Title,
+		Description: anyVideo.Description,
+	}
+
+	if anyVideo.Asset != nil {
+		response.Asset = &Asset{
+			ID: anyVideo.Asset.ID,
+		}
+	}
+
+	return response, nil
 }
 
 func (m *MockedVideos) GetByID(ctx context.Context, id string) (*Video, error) {
 	ID := "fcdf5f4e-b086-4b52-8714-bf3623186185"
+	IDWithSourceFile := "a9200233-9b62-489c-9cbc-bb37f2922804"
 
 	switch id {
 	case ID:
@@ -35,6 +47,15 @@ func (m *MockedVideos) GetByID(ctx context.Context, id string) (*Video, error) {
 			ID:          &ID,
 			Title:       "Some Might Say",
 			Description: "Oasis song from (What's the Story) Morning Glory? album.",
+		}, nil
+	case IDWithSourceFile:
+		return &Video{
+			ID:          &ID,
+			Title:       "Some Might Say",
+			Description: "Oasis song from (What's the Story) Morning Glory? album.",
+			Asset: &Asset{
+				ID: IDWithSourceFile,
+			},
 		}, nil
 	}
 
@@ -48,6 +69,18 @@ func TestCreateVideoHandler(t *testing.T) {
 	completeVideo := &Video{
 		Title:       "Some Might Say",
 		Description: "Oasis song from (What's the Story) Morning Glory? album.",
+		SourceURL:   "https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4",
+	}
+
+	incompleteVideo := &Video{
+		Title:       "Some Might Say",
+		Description: "Oasis song from (What's the Story) Morning Glory? album.",
+	}
+
+	invalidVideo := &Video{
+		Title:       "Some Might Say",
+		Description: "Oasis song from (What's the Story) Morning Glory? album.",
+		SourceURL:   "invalidURL",
 	}
 
 	titleVideo := &Video{
@@ -60,15 +93,18 @@ func TestCreateVideoHandler(t *testing.T) {
 
 	emptyVideo := &Video{}
 
-	mocked := new(MockedVideos)
+	mockedVideos := new(MockedVideos)
+	mockedAssets := new(MockedAssets)
 
 	// Create an app
 	awesome := App{
 		logger: logger,
-		videos: mocked,
+		videos: mockedVideos,
+		assets: mockedAssets,
 	}
 
-	expectedComplete := `{"id":"fcdf5f4e-b086-4b52-8714-bf3623186185","title":"Some Might Say","description":"Oasis song from (What's the Story) Morning Glory? album."}`
+	expectedComplete := `{"id":"fcdf5f4e-b086-4b52-8714-bf3623186185","title":"Some Might Say","description":"Oasis song from (What's the Story) Morning Glory? album.","asset":{"id":"5iNFJg9dIww2AgUryhgghbP00Dc4ogoxn00gzitOdjICg"}}`
+	expectedIncomplete := `{"id":"fcdf5f4e-b086-4b52-8714-bf3623186185","title":"Some Might Say","description":"Oasis song from (What's the Story) Morning Glory? album."}`
 	expectedUnprocessable := `{"message":"Unprocessable Entity","status":422}`
 	expectedBadRequest := `{"message":"Invalid request","status":400}`
 
@@ -79,6 +115,8 @@ func TestCreateVideoHandler(t *testing.T) {
 		body         *Video
 	}{
 		{"Valid", http.StatusCreated, expectedComplete, completeVideo},
+		{"Valid (with source file)", http.StatusCreated, expectedIncomplete, incompleteVideo},
+		{"Invalid Source File URL", http.StatusCreated, expectedIncomplete, invalidVideo},
 		{"Empty description", http.StatusUnprocessableEntity, expectedUnprocessable, titleVideo},
 		{"Empty title", http.StatusUnprocessableEntity, expectedUnprocessable, descriptionVideo},
 		{"Empty body", http.StatusUnprocessableEntity, expectedUnprocessable, emptyVideo},
@@ -188,16 +226,20 @@ func TestReadVideoHandler(t *testing.T) {
 	logger.Out = ioutil.Discard
 
 	ID := "fcdf5f4e-b086-4b52-8714-bf3623186185"
+	IDWithSourceFile := "a9200233-9b62-489c-9cbc-bb37f2922804"
 
-	mocked := new(MockedVideos)
+	mockedVideos := new(MockedVideos)
+	mockedAssets := new(MockedAssets)
 
 	// Create an app
 	awesome := App{
 		logger: logger,
-		videos: mocked,
+		videos: mockedVideos,
+		assets: mockedAssets,
 	}
 
 	expectedComplete := `{"id":"fcdf5f4e-b086-4b52-8714-bf3623186185","title":"Some Might Say","description":"Oasis song from (What's the Story) Morning Glory? album."}`
+	expectedWithSourceFile := `{"id":"fcdf5f4e-b086-4b52-8714-bf3623186185","title":"Some Might Say","description":"Oasis song from (What's the Story) Morning Glory? album.","asset":{"id":"5iNFJg9dIww2AgUryhgghbP00Dc4ogoxn00gzitOdjICg"}}`
 	expectedNotFound := `{"message":"video not found","status":404}`
 	expectedUnprocessable := `{"message":"Unprocessable Entity","status":422}`
 
@@ -208,6 +250,7 @@ func TestReadVideoHandler(t *testing.T) {
 		ID           string
 	}{
 		{"Valid", http.StatusOK, expectedComplete, ID},
+		{"Valid (with source file)", http.StatusOK, expectedWithSourceFile, IDWithSourceFile},
 		{"Not found", http.StatusNotFound, expectedNotFound, "xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx"},
 		{"Not UUID", http.StatusUnprocessableEntity, expectedUnprocessable, "xxxxxxxx"},
 	}

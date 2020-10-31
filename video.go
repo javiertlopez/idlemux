@@ -19,6 +19,8 @@ type Video struct {
 	ID          *string  `json:"id,omitempty"`
 	Title       string   `json:"title,omitempty"`
 	Description string   `json:"description,omitempty"`
+	SourceURL   string   `json:"source_url,omitempty"`
+	Asset       *Asset   `json:"asset,omitempty"`
 	Duration    *float64 `json:"duration,omitempty"`
 	CreatedAt   string   `json:"created_at,omitempty"`
 	UpdatedAt   string   `json:"updated_at,omitempty"`
@@ -56,6 +58,16 @@ func (a *App) CreateVideoHandler(w http.ResponseWriter, r *http.Request) {
 			},
 		)
 		return
+	}
+
+	// If body contains a Source File URL, send it to Ingestion
+	if len(video.SourceURL) > 0 {
+		assetID, err := a.assets.Ingest(r.Context(), video.SourceURL)
+		if err == nil {
+			video.Asset = &Asset{
+				ID: assetID,
+			}
+		}
 	}
 
 	response, err := a.videos.Insert(r.Context(), &video)
@@ -120,6 +132,14 @@ func (a *App) ReadVideoHandler(w http.ResponseWriter, r *http.Request) {
 			},
 		)
 		return
+	}
+
+	// If video document contains an Asset ID, retrieve the information
+	if response.Asset != nil {
+		asset, err := a.assets.GetByID(r.Context(), response.Asset.ID)
+		if err == nil {
+			response.Asset = asset
+		}
 	}
 
 	JSONResponse(
