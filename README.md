@@ -1,4 +1,4 @@
-# awesome
+# awesome [![Build Status](https://travis-ci.com/javiertlopez/awesome.svg?token=pyy6Hs7N6KLZpHXbFbXd&branch=main)](https://travis-ci.com/javiertlopez/awesome) [![codecov](https://codecov.io/gh/javiertlopez/awesome/branch/main/graph/badge.svg?token=I8D2Z4TZX4)](undefined)
 
 ## Overview
 Awesome is a REST API that stores a Video Library in Mongo Atlas.
