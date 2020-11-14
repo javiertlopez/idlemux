@@ -154,6 +154,7 @@ func (a *assets) GetByID(ctx context.Context, id string) (*awesome.Asset, error)
 		asset.Sources = []awesome.Source{
 			{
 				ID:     playbackID,
+				Policy: fmt.Sprintf("%s", body.data.PlaybackIds[0].Policy),
 				Source: source,
 				Type:   "application/x-mpegURL",
 			},
