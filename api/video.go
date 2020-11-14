@@ -120,7 +120,10 @@ func (a *App) ReadVideoHandler(w http.ResponseWriter, r *http.Request) {
 	if response.Asset != nil {
 		asset, err := a.assets.GetByID(r.Context(), response.Asset.ID)
 		if err == nil {
-			response.Asset = asset
+			response.Asset = nil
+			response.Poster = asset.Poster
+			response.Thumbnail = asset.Thumbnail
+			response.Sources = asset.Sources
 		}
 	}
 
