@@ -7,11 +7,13 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
+// MockedAssets struct
 type MockedAssets struct {
 	mock.Mock
 }
 
-func (m *MockedAssets) Ingest(ctx context.Context, source string) (string, error) {
+// Ingest mocked method
+func (m *MockedAssets) Ingest(ctx context.Context, source string, public bool) (string, error) {
 	ValidURL := "https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4"
 	switch source {
 	case ValidURL:
@@ -20,6 +22,7 @@ func (m *MockedAssets) Ingest(ctx context.Context, source string) (string, error
 	return "", awesome.ErrIngestionFailed
 }
 
+// GetByID mocked method
 func (m *MockedAssets) GetByID(ctx context.Context, id string) (*awesome.Asset, error) {
 	ID := "5iNFJg9dIww2AgUryhgghbP00Dc4ogoxn00gzitOdjICg"
 

@@ -4,7 +4,7 @@ import "context"
 
 // Assets interface, for testing purposes
 type Assets interface {
-	Ingest(ctx context.Context, source string) (string, error)
+	Ingest(ctx context.Context, source string, public bool) (string, error)
 	GetByID(ctx context.Context, id string) (*Asset, error)
 }
 
