@@ -44,7 +44,7 @@ func (a *App) CreateVideoHandler(w http.ResponseWriter, r *http.Request) {
 
 	// If body contains a Source File URL, send it to Ingestion
 	if len(video.SourceURL) > 0 {
-		assetID, err := a.assets.Ingest(r.Context(), video.SourceURL)
+		assetID, err := a.assets.Ingest(r.Context(), video.SourceURL, true)
 		if err == nil {
 			video.Asset = &awesome.Asset{
 				ID: assetID,

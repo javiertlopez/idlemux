@@ -27,6 +27,8 @@ func main() {
 	mongoString := os.Getenv("MONGO_STRING")
 	muxTokenID := os.Getenv("MUX_TOKEN_ID")
 	muxTokenSecret := os.Getenv("MUX_TOKEN_SECRET")
+	muxKeyID := os.Getenv("MUX_KEY_ID")
+	muxKeySecret := os.Getenv("MUX_KEY_SECRET")
 
 	// Create a logrus logger and set up the output format as JSON
 	logger := logrus.New()
@@ -57,6 +59,8 @@ func main() {
 		assets: asset.NewAssetService(
 			logger,
 			muxClient,
+			muxKeyID,
+			muxKeySecret,
 		),
 		videos: video.NewVideoService(
 			logger,
