@@ -33,7 +33,7 @@ jobs:
       run: go build -v -o api ./api
 
     - name: Generate coverage report
-      run: go test -v ./api -race --cov-report=xml -covermode=atomic
+      run: go test -v ./api -race -coverprofile=coverage.xml -covermode=atomic
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
