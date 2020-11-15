@@ -42,7 +42,7 @@ func (m *MockedVideos) GetByID(ctx context.Context, id string) (*awesome.Video, 
 		}, nil
 	case IDWithSourceFile:
 		return &awesome.Video{
-			ID:          &ID,
+			ID:          &IDWithSourceFile,
 			Title:       "Some Might Say",
 			Description: "Oasis song from (What's the Story) Morning Glory? album.",
 			Asset: &awesome.Asset{
