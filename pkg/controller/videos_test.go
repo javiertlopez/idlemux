@@ -1,4 +1,4 @@
-package main
+package controller
 
 import (
 	"bytes"
@@ -9,54 +9,51 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	awesome "github.com/javiertlopez/awesome/pkg"
-	"github.com/javiertlopez/awesome/pkg/asset"
-	"github.com/javiertlopez/awesome/pkg/video"
-
 	"github.com/gorilla/mux"
+	"github.com/javiertlopez/awesome/pkg/model"
+	"github.com/javiertlopez/awesome/pkg/repository/axiom"
+	"github.com/javiertlopez/awesome/pkg/repository/muxinc"
+	"github.com/javiertlopez/awesome/pkg/usecase"
 	"github.com/sirupsen/logrus"
 )
 
-func TestCreateVideoHandler(t *testing.T) {
+func TestCreate(t *testing.T) {
 	logger := logrus.New()
 	logger.Out = ioutil.Discard
 
-	completeVideo := &awesome.Video{
+	completeVideo := &model.Video{
 		Title:       "Some Might Say",
 		Description: "Oasis song from (What's the Story) Morning Glory? album.",
 		SourceURL:   "https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4",
 	}
 
-	incompleteVideo := &awesome.Video{
+	incompleteVideo := &model.Video{
 		Title:       "Some Might Say",
 		Description: "Oasis song from (What's the Story) Morning Glory? album.",
 	}
 
-	invalidVideo := &awesome.Video{
+	invalidVideo := &model.Video{
 		Title:       "Some Might Say",
 		Description: "Oasis song from (What's the Story) Morning Glory? album.",
 		SourceURL:   "invalidURL",
 	}
 
-	titleVideo := &awesome.Video{
+	titleVideo := &model.Video{
 		Title: "Some Might Say",
 	}
 
-	descriptionVideo := &awesome.Video{
+	descriptionVideo := &model.Video{
 		Description: "Oasis song from (What's the Story) Morning Glory? album.",
 	}
 
-	emptyVideo := &awesome.Video{}
+	emptyVideo := &model.Video{}
 
-	mockedVideos := new(video.MockedVideos)
-	mockedAssets := new(asset.MockedAssets)
+	mockedAssets := new(muxinc.MockedAssets)
+	mockedVideos := new(axiom.MockedVideos)
 
-	// Create an app
-	awesomeApp := App{
-		logger: logger,
-		videos: mockedVideos,
-		assets: mockedAssets,
-	}
+	videos := usecase.NewVideoUseCase(mockedAssets, mockedVideos)
+
+	controller := NewEventController(videos)
 
 	expectedComplete := `{"id":"fcdf5f4e-b086-4b52-8714-bf3623186185","title":"Some Might Say","description":"Oasis song from (What's the Story) Morning Glory? album.","asset":{"id":"5iNFJg9dIww2AgUryhgghbP00Dc4ogoxn00gzitOdjICg"}}`
 	expectedIncomplete := `{"id":"fcdf5f4e-b086-4b52-8714-bf3623186185","title":"Some Might Say","description":"Oasis song from (What's the Story) Morning Glory? album."}`
@@ -67,7 +64,7 @@ func TestCreateVideoHandler(t *testing.T) {
 		name         string
 		expectedCode int
 		expectedBody string
-		body         *awesome.Video
+		body         *model.Video
 	}{
 		{"Valid", http.StatusCreated, expectedComplete, completeVideo},
 		{"Valid (with source file)", http.StatusCreated, expectedIncomplete, incompleteVideo},
@@ -89,7 +86,7 @@ func TestCreateVideoHandler(t *testing.T) {
 
 			// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
 			rr := httptest.NewRecorder()
-			handler := http.HandlerFunc(awesomeApp.CreateVideoHandler)
+			handler := http.HandlerFunc(controller.Create)
 
 			// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
 			// directly and pass in our Request and ResponseRecorder.
@@ -139,7 +136,7 @@ func TestCreateVideoHandler(t *testing.T) {
 
 		// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(awesomeApp.CreateVideoHandler)
+		handler := http.HandlerFunc(controller.Create)
 
 		// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
 		// directly and pass in our Request and ResponseRecorder.
@@ -176,25 +173,22 @@ func TestCreateVideoHandler(t *testing.T) {
 	})
 }
 
-func TestReadVideoHandler(t *testing.T) {
+func TestGetByID(t *testing.T) {
 	logger := logrus.New()
 	logger.Out = ioutil.Discard
 
 	ID := "fcdf5f4e-b086-4b52-8714-bf3623186185"
 	IDWithSourceFile := "a9200233-9b62-489c-9cbc-bb37f2922804"
 
-	mockedVideos := new(video.MockedVideos)
-	mockedAssets := new(asset.MockedAssets)
+	mockedAssets := new(muxinc.MockedAssets)
+	mockedVideos := new(axiom.MockedVideos)
 
-	// Create an app
-	awesomeApp := App{
-		logger: logger,
-		videos: mockedVideos,
-		assets: mockedAssets,
-	}
+	videos := usecase.NewVideoUseCase(mockedAssets, mockedVideos)
+
+	controller := NewEventController(videos)
 
 	expectedComplete := `{"id":"fcdf5f4e-b086-4b52-8714-bf3623186185","title":"Some Might Say","description":"Oasis song from (What's the Story) Morning Glory? album."}`
-	expectedWithSourceFile := `{"id":"a9200233-9b62-489c-9cbc-bb37f2922804","title":"Some Might Say","description":"Oasis song from (What's the Story) Morning Glory? album.","poster":"https://image.mux.com/5iNFJg9dIww2AgUryhgghbP00Dc4ogoxn00gzitOdjICg/thumbnail.png?width=1920\u0026height=1080\u0026smart_crop=true\u0026time=7","thumbnail":"https://image.mux.com/5iNFJg9dIww2AgUryhgghbP00Dc4ogoxn00gzitOdjICg/thumbnail.png?width=640\u0026height=360\u0026smart_crop=true\u0026time=7","sources":[{"id":"5iNFJg9dIww2AgUryhgghbP00Dc4ogoxn00gzitOdjICg","policy":"public","src":"https://stream.mux.com/5iNFJg9dIww2AgUryhgghbP00Dc4ogoxn00gzitOdjICg.m3u8","type":"application/x-mpegURL"}]}`
+	expectedWithSourceFile := `{"id":"a9200233-9b62-489c-9cbc-bb37f2922804","title":"Some Might Say","description":"Oasis song from (What's the Story) Morning Glory? album.","asset":{"id":"5iNFJg9dIww2AgUryhgghbP00Dc4ogoxn00gzitOdjICg"}}`
 	expectedNotFound := `{"message":"video not found","status":404}`
 	expectedUnprocessable := `{"message":"Unprocessable Entity","status":422}`
 
@@ -222,7 +216,7 @@ func TestReadVideoHandler(t *testing.T) {
 			rr := httptest.NewRecorder()
 
 			router := mux.NewRouter()
-			router.HandleFunc("/videos/{id}", awesomeApp.ReadVideoHandler)
+			router.HandleFunc("/videos/{id}", controller.GetByID)
 
 			// Change to Gorilla Mux router to pass variables
 			router.ServeHTTP(rr, req)

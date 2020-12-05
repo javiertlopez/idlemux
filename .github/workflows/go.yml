@@ -30,18 +30,16 @@ jobs:
         fi
 
     - name: Build
-      run: go build -v -o api ./api
+      run: go build -v -o awesome ./pkg
 
     - name: Generate coverage report
-      run: go test -v ./api -race -coverprofile=coverage.xml -covermode=atomic
+      run: go test -v ./... -race -coverprofile=coverage.xml -covermode=atomic
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
       with:
         file: ./coverage.xml
-        files: ./coverage1.xml,./coverage2.xml
-        directory: ./coverage/reports/
         name: codecov-umbrella
         fail_ci_if_error: true
-        path_to_write_report: ./coverage/codecov_report.gz
+        path_to_write_report: ./codecov_report.gz
         verbose: true

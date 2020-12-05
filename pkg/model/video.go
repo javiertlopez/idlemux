@@ -1,12 +1,4 @@
-package awesome
-
-import "context"
-
-// Videos interface, for testing purposes
-type Videos interface {
-	Insert(ctx context.Context, anyVideo *Video) (*Video, error)
-	GetByID(ctx context.Context, id string) (*Video, error)
-}
+package model
 
 // Video struct
 type Video struct {

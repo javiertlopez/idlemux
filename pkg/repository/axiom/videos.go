@@ -1,16 +1,22 @@
-package video
+package axiom
 
 import (
 	"context"
 	"time"
 
+	"github.com/javiertlopez/awesome/pkg/errorcodes"
+	"github.com/javiertlopez/awesome/pkg/model"
+	"github.com/javiertlopez/awesome/pkg/repository"
+
 	guuid "github.com/google/uuid"
-	awesome "github.com/javiertlopez/awesome/pkg"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
+
+// Collection keeps the collection name
+const Collection = "videos"
 
 // video model for mongodb
 type video struct {
@@ -25,24 +31,27 @@ type video struct {
 
 // videos struct holds the logger and MongoDB client
 type videos struct {
-	logger *logrus.Logger
+	db     string
 	mongo  *mongo.Client
+	logger *logrus.Logger
 }
 
-// NewVideoService creates new an Videos service object
-func NewVideoService(
+// NewVideoRepo method
+func NewVideoRepo(
 	l *logrus.Logger,
+	db string,
 	m *mongo.Client,
-) awesome.Videos {
+) repository.VideoRepo {
 	return &videos{
-		logger: l,
+		db:     db,
 		mongo:  m,
+		logger: l,
 	}
 }
 
-// Insert video creates a new ID, stores the video and returns the new object
-func (v *videos) Insert(ctx context.Context, anyVideo *awesome.Video) (*awesome.Video, error) {
-	collection := v.mongo.Database("awesome").Collection("videos")
+// Create video creates a new ID, stores the video and returns the new object
+func (v *videos) Create(ctx context.Context, anyVideo model.Video) (model.Video, error) {
+	collection := v.mongo.Database(v.db).Collection(Collection)
 	time := time.Now()
 
 	uuid := guuid.New().String()
@@ -67,17 +76,17 @@ func (v *videos) Insert(ctx context.Context, anyVideo *awesome.Video) (*awesome.
 			"uuid": uuid,
 		}).Error(err.Error())
 
-		return nil, err
+		return model.Video{}, err
 	}
 
 	return insert.toModel(), nil
 }
 
 // GetByID retrieves a video with the ID
-func (v *videos) GetByID(ctx context.Context, id string) (*awesome.Video, error) {
+func (v *videos) GetByID(ctx context.Context, id string) (model.Video, error) {
 	var response video
 
-	collection := v.mongo.Database("awesome").Collection("videos")
+	collection := v.mongo.Database(v.db).Collection(Collection)
 
 	filter := bson.M{"_id": id}
 
@@ -91,23 +100,21 @@ func (v *videos) GetByID(ctx context.Context, id string) (*awesome.Video, error)
 		}).Error(err.Error())
 
 		if err == mongo.ErrNoDocuments {
-			return nil, awesome.ErrVideoNotFound
+			return model.Video{}, errorcodes.ErrVideoNotFound
 		}
 
-		return nil, err
+		return model.Video{}, err
 	}
 
-	anyVideo := response.toModel()
-
-	return anyVideo, nil
+	return response.toModel(), nil
 }
 
-func (v video) toModel() *awesome.Video {
-	return &awesome.Video{
+func (v video) toModel() model.Video {
+	return model.Video{
 		ID:          &v.ID,
 		Title:       v.Title,
 		Description: v.Description,
-		Asset: &awesome.Asset{
+		Asset: &model.Asset{
 			ID: v.AssetID,
 		},
 		Duration:  v.Duration,

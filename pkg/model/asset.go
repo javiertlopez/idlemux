@@ -1,12 +1,4 @@
-package awesome
-
-import "context"
-
-// Assets interface, for testing purposes
-type Assets interface {
-	Ingest(ctx context.Context, source string, public bool) (string, error)
-	GetByID(ctx context.Context, id string) (*Asset, error)
-}
+package model
 
 // Asset Information from Mux
 type Asset struct {
@@ -26,8 +18,6 @@ type Asset struct {
 
 // Source manifests
 type Source struct {
-	ID     string `json:"id"`
-	Policy string `json:"policy"`
 	Source string `json:"src"`
 	Type   string `json:"type"`
 }

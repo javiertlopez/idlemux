@@ -1,4 +1,4 @@
-package asset
+package muxinc
 
 import (
 	"context"
@@ -6,15 +6,16 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/javiertlopez/awesome/pkg/model"
+	"github.com/javiertlopez/awesome/pkg/repository"
+
 	"github.com/dgrijalva/jwt-go"
 	muxgo "github.com/muxinc/mux-go"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
-
-	awesome "github.com/javiertlopez/awesome/pkg"
 )
 
-// videos struct holds the logger and MongoDB client
+// assets struct
 type assets struct {
 	logger    *logrus.Logger
 	mux       *muxgo.APIClient
@@ -26,13 +27,13 @@ type asset struct {
 	data muxgo.Asset
 }
 
-// NewAssetService creates new an Videos service object
-func NewAssetService(
+// NewAssetRepo creates new an Videos service object
+func NewAssetRepo(
 	l *logrus.Logger,
 	m *muxgo.APIClient,
 	id string,
 	secret string,
-) awesome.Assets {
+) repository.AssetRepo {
 	return &assets{
 		logger:    l,
 		mux:       m,
@@ -43,7 +44,7 @@ func NewAssetService(
 
 // Ingest send a source file url to mux.com
 // Returns a string Asset ID
-func (a *assets) Ingest(ctx context.Context, source string, public bool) (string, error) {
+func (a *assets) Create(ctx context.Context, source string, public bool) (string, error) {
 	var policy []muxgo.PlaybackPolicy
 
 	if public {
@@ -75,11 +76,11 @@ func (a *assets) Ingest(ctx context.Context, source string, public bool) (string
 }
 
 // GetByID retrieves an asset from Mux.com by Asset ID
-func (a *assets) GetByID(ctx context.Context, id string) (*awesome.Asset, error) {
+func (a *assets) GetByID(ctx context.Context, id string) (model.Asset, error) {
 	response, err := a.mux.AssetsApi.GetAsset(id)
 
 	if err != nil {
-		return nil, err
+		return model.Asset{}, err
 	}
 
 	body := asset{
@@ -117,7 +118,7 @@ func (a *assets) GetByID(ctx context.Context, id string) (*awesome.Asset, error)
 		case muxgo.SIGNED:
 			token, err := a.signURL(playbackID, "v", asset.Duration, 0, 0)
 			if err != nil {
-				return nil, err
+				return model.Asset{}, err
 			}
 
 			source = fmt.Sprintf(
@@ -128,7 +129,7 @@ func (a *assets) GetByID(ctx context.Context, id string) (*awesome.Asset, error)
 
 			token, err = a.signURL(playbackID, "t", asset.Duration, 1920, 1080)
 			if err != nil {
-				return nil, err
+				return model.Asset{}, err
 			}
 
 			poster = fmt.Sprintf(
@@ -139,7 +140,7 @@ func (a *assets) GetByID(ctx context.Context, id string) (*awesome.Asset, error)
 
 			token, err = a.signURL(playbackID, "t", asset.Duration, 640, 360)
 			if err != nil {
-				return nil, err
+				return model.Asset{}, err
 			}
 
 			thumbnail = fmt.Sprintf(
@@ -151,10 +152,8 @@ func (a *assets) GetByID(ctx context.Context, id string) (*awesome.Asset, error)
 
 		asset.Poster = poster
 		asset.Thumbnail = thumbnail
-		asset.Sources = []awesome.Source{
+		asset.Sources = []model.Source{
 			{
-				ID:     playbackID,
-				Policy: fmt.Sprintf("%s", body.data.PlaybackIds[0].Policy),
 				Source: source,
 				Type:   "application/x-mpegURL",
 			},
@@ -164,8 +163,8 @@ func (a *assets) GetByID(ctx context.Context, id string) (*awesome.Asset, error)
 	return asset, nil
 }
 
-func (a *asset) toModel() *awesome.Asset {
-	return &awesome.Asset{
+func (a *asset) toModel() model.Asset {
+	return model.Asset{
 		ID:                  a.data.Id,
 		CreatedAt:           a.data.CreatedAt,
 		Status:              a.data.Status,
