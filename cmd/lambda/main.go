@@ -34,6 +34,8 @@ func init() {
 
 	application = awesome.New(
 		awesome.AppConfig{
+			Commit:         commit,
+			Version:        version,
 			MongoDB:        mongoDB,
 			MongoURI:       mongoString,
 			MuxTokenID:     muxTokenID,
