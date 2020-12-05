@@ -14,6 +14,8 @@ import (
 
 var (
 	application awesome.App
+	commit      string
+	version     string
 	adapter     *gorillamux.GorillaMuxAdapter
 )
 
