@@ -53,7 +53,7 @@ func TestCreate(t *testing.T) {
 
 	videos := usecase.NewVideoUseCase(mockedAssets, mockedVideos)
 
-	controller := NewEventController(videos)
+	controller := NewVideoController(videos)
 
 	expectedComplete := `{"id":"fcdf5f4e-b086-4b52-8714-bf3623186185","title":"Some Might Say","description":"Oasis song from (What's the Story) Morning Glory? album.","asset":{"id":"5iNFJg9dIww2AgUryhgghbP00Dc4ogoxn00gzitOdjICg"}}`
 	expectedIncomplete := `{"id":"fcdf5f4e-b086-4b52-8714-bf3623186185","title":"Some Might Say","description":"Oasis song from (What's the Story) Morning Glory? album."}`
@@ -185,7 +185,7 @@ func TestGetByID(t *testing.T) {
 
 	videos := usecase.NewVideoUseCase(mockedAssets, mockedVideos)
 
-	controller := NewEventController(videos)
+	controller := NewVideoController(videos)
 
 	expectedComplete := `{"id":"fcdf5f4e-b086-4b52-8714-bf3623186185","title":"Some Might Say","description":"Oasis song from (What's the Story) Morning Glory? album."}`
 	expectedWithSourceFile := `{"id":"a9200233-9b62-489c-9cbc-bb37f2922804","title":"Some Might Say","description":"Oasis song from (What's the Story) Morning Glory? album.","asset":{"id":"5iNFJg9dIww2AgUryhgghbP00Dc4ogoxn00gzitOdjICg"}}`

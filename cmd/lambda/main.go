@@ -14,6 +14,8 @@ import (
 
 var (
 	application awesome.App
+	commit      string
+	version     string
 	adapter     *gorillamux.GorillaMuxAdapter
 )
 
@@ -32,6 +34,8 @@ func init() {
 
 	application = awesome.New(
 		awesome.AppConfig{
+			Commit:         commit,
+			Version:        version,
 			MongoDB:        mongoDB,
 			MongoURI:       mongoString,
 			MuxTokenID:     muxTokenID,
