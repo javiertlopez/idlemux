@@ -2,8 +2,8 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/javiertlopez/awesome/pkg/errorcodes"
 	"github.com/javiertlopez/awesome/pkg/model"
 	"github.com/javiertlopez/awesome/pkg/repository"
 )
@@ -34,7 +34,7 @@ func NewVideoUseCase(
 func (v *videos) Create(ctx context.Context, anyVideo model.Video) (model.Video, error) {
 	// Title and Description are mandatory fields
 	if len(anyVideo.Title) == 0 || len(anyVideo.Description) == 0 {
-		return model.Video{}, fmt.Errorf("Title and Description are mandatory fields")
+		return model.Video{}, errorcodes.ErrVideoUnprocessable
 	}
 
 	// If body contains a Source File URL, send it to Ingestion

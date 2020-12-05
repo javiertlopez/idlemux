@@ -29,6 +29,18 @@ func (vc *videoController) Create(w http.ResponseWriter, r *http.Request) {
 	response, err := vc.videos.Create(r.Context(), video)
 
 	if err != nil {
+		// Look for Custom Error
+		if err == errorcodes.ErrVideoUnprocessable {
+			JSONResponse(
+				w, http.StatusUnprocessableEntity,
+				Response{
+					Message: err.Error(),
+					Status:  http.StatusUnprocessableEntity,
+				},
+			)
+			return
+		}
+
 		JSONResponse(
 			w, http.StatusInternalServerError,
 			Response{
