@@ -6,9 +6,28 @@ import (
 
 	"github.com/javiertlopez/awesome/pkg/errorcodes"
 	"github.com/javiertlopez/awesome/pkg/model"
+	"github.com/javiertlopez/awesome/pkg/usecase"
 
 	"github.com/gorilla/mux"
 )
+
+// VideoController handles the HTTP requests
+type VideoController interface {
+	Create(w http.ResponseWriter, r *http.Request)
+	GetByID(w http.ResponseWriter, r *http.Request)
+}
+
+// videoController struct holds the usecase
+type videoController struct {
+	videos usecase.Videos
+}
+
+// NewVideoController returns a VideoController
+func NewVideoController(videos usecase.Videos) VideoController {
+	return &videoController{
+		videos,
+	}
+}
 
 // Create controller
 func (vc *videoController) Create(w http.ResponseWriter, r *http.Request) {

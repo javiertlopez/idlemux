@@ -30,6 +30,8 @@ type App struct {
 
 // AppConfig struct with configuration variables
 type AppConfig struct {
+	Commit         string
+	Version        string
 	MongoDB        string
 	MongoURI       string
 	MuxTokenID     string
@@ -71,11 +73,14 @@ func New(config AppConfig, logger *logrus.Logger) App {
 	// Init usecase
 	videos := usecase.NewVideoUseCase(assetsRepo, videosRepo)
 
-	// Init controller
-	controller := controller.NewEventController(videos)
+	// Init appController
+	appController := controller.NewAppController(config.Commit, config.Version)
+
+	// Init videoController
+	videoController := controller.NewVideoController(videos)
 
 	// Setup router
-	router := router.New(controller)
+	router := router.New(appController, videoController)
 
 	return App{
 		logger,
