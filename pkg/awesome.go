@@ -83,3 +83,8 @@ func New(config AppConfig, logger *logrus.Logger) App {
 		config,
 	}
 }
+
+// Router returns the *mux.Router
+func (a *App) Router() *mux.Router {
+	return a.router
+}
