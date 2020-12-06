@@ -66,7 +66,7 @@ func (v *videos) GetByID(ctx context.Context, id string) (model.Video, error) {
 
 	// If video document contains an Asset ID, retrieve the information
 	if response.Asset != nil {
-		asset, err := v.videos.GetByID(ctx, response.Asset.ID)
+		asset, err := v.assets.GetByID(ctx, response.Asset.ID)
 		if err == nil {
 			response.Asset = nil
 			response.Poster = asset.Poster
