@@ -13,3 +13,6 @@
 
 # Env variables
 *.env
+
+# dist
+dist
