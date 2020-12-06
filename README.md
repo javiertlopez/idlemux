@@ -1,16 +1,16 @@
-# awesome [![Build Status](https://travis-ci.com/javiertlopez/awesome.svg?token=pyy6Hs7N6KLZpHXbFbXd&branch=main)](https://travis-ci.com/javiertlopez/awesome) [![codecov](https://codecov.io/gh/javiertlopez/awesome/branch/main/graph/badge.svg?token=I8D2Z4TZX4)](undefined)
+# awesome   ![Integration Test](https://github.com/javiertlopez/awesome/workflows/Integration%20Test/badge.svg) [![codecov](https://codecov.io/gh/javiertlopez/awesome/branch/main/graph/badge.svg?token=I8D2Z4TZX4)](https://codecov.io/gh/javiertlopez/awesome)
 
 ## Overview
 Awesome is a REST API that stores a Video Library in Mongo Atlas and Mux.com for video ingestion.
 
 ## Dependencies
 
-- Go 1.15.3
+- Go 1.15.6
 - github.com/google/uuid v1.1.2
 - github.com/gorilla/mux v1.8.0
-- github.com/muxinc/mux-go v0.9.0
+- github.com/muxinc/mux-go v0.10.0
 - github.com/sirupsen/logrus v1.7.0
-- go.mongodb.org/mongo-driver v1.4.2
+- go.mongodb.org/mongo-driver v1.4.4
 
 For testing
 - github.com/stretchr/testify v1.6.1
@@ -20,7 +20,7 @@ For testing
 Install dependencies:
 
 ```bash
-go get github.com/javiertlopez/awesome/api 
+go get github.com/javiertlopez/awesome/pkg
 ```
 
 ### From Terminal
@@ -36,7 +36,7 @@ export MUX_TOKEN_SECRET=muxTokenSecret
 Run app directly from terminal:
 
 ```bash
-go run ./api
+go run ./cmd/container
 ```
 
 ### From Visual Studio
@@ -48,13 +48,13 @@ The project is setup to run directly from Visual Studio Run tab. Just fill the c
 Create a docker image
 
 ```bash
-docker build -t javiertlopez/awesome-api .
+make image
 ```
 
 Run the docker container
 
 ```bash
-docker run --env-file=dev.env -d -p 8080:8080 javiertlopez/awesome-api
+docker run --env-file=dev.env -d -p 8080:8080 javiertlopez/awesome
 ```
 
 **Note.** It is required to fill the `dev.env` file.
@@ -67,12 +67,12 @@ The Awesome App runs at 8080 port.
 
 ### Hello World
 
-Hello World path: `/app/hello`
+Hello World path: `/app/healthz`
 
 Example:
 
 ```bash
-curl --location --request GET 'http://127.0.0.1:8080/app/hello'
+curl --location --request GET 'http://127.0.0.1:8080/app/healthz'
 ```
 
 Response:
@@ -102,7 +102,6 @@ Response:
     "id": "81095f2d-76d9-4b7b-a3d8-727aa90617c3",
     "title": "Don't Look Back In Anger",
     "description": "Oasis song from (What's the Story) Morning Glory? album.",
-    "asset": {},
     "created_at": "2020-10-31 20:05:40.127259884 +0000 UTC m=+317.213044791",
     "updated_at": "2020-10-31 20:05:40.127259884 +0000 UTC m=+317.213044791"
 }
@@ -151,7 +150,6 @@ Response:
     "id": "81095f2d-76d9-4b7b-a3d8-727aa90617c3",
     "title": "Don't Look Back In Anger",
     "description": "Oasis song from (What's the Story) Morning Glory? album.",
-    "asset": {},
     "created_at": "2020-10-31 20:05:40.127 +0000 UTC",
     "updated_at": "2020-10-31 20:05:40.127 +0000 UTC"
 }
