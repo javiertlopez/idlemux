@@ -1,5 +1,11 @@
-# golang alpine 1.15.3
-FROM golang:1.15.3-alpine as builder
+# golang alpine 1.15.6
+FROM golang:1.15.6-alpine as builder
+
+ARG commit
+ARG version
+
+ENV commit=$commit
+ENV version=$version
 
 # SSL for HTTPS calls.
 RUN apk update && apk add --no-cache ca-certificates tzdata && update-ca-certificates
@@ -21,8 +27,8 @@ RUN adduser \
 WORKDIR $GOPATH/src/github.com/javiertlopez/awesome/
 COPY . .
 
-RUN go get github.com/javiertlopez/awesome/api
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /go/bin/main ./api
+RUN go get github.com/javiertlopez/awesome/cmd/container
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s -X main.commit=${commit} -X main.version=${version}" -o /go/bin/main ./cmd/container
 
 # Small image
 FROM scratch
