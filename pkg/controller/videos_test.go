@@ -2,99 +2,86 @@ package controller
 
 import (
 	"bytes"
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gorilla/mux"
+	"github.com/javiertlopez/awesome/pkg/errorcodes"
+	mocks "github.com/javiertlopez/awesome/pkg/mocks/usecase"
 	"github.com/javiertlopez/awesome/pkg/model"
-	"github.com/javiertlopez/awesome/pkg/repository/axiom"
-	"github.com/javiertlopez/awesome/pkg/repository/muxinc"
-	"github.com/javiertlopez/awesome/pkg/usecase"
-	"github.com/sirupsen/logrus"
+
+	"github.com/gorilla/mux"
+	"github.com/stretchr/testify/mock"
 )
 
-func TestCreate(t *testing.T) {
-	logger := logrus.New()
-	logger.Out = ioutil.Discard
-
-	completeVideo := &model.Video{
+func Test_videoController_Create(t *testing.T) {
+	completeVideo := model.Video{
 		Title:       "Some Might Say",
-		Description: "Oasis song from (What's the Story) Morning Glory? album.",
+		Description: "(What's the Story) Morning Glory?",
 		SourceURL:   "https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4",
 	}
-
-	incompleteVideo := &model.Video{
-		Title:       "Some Might Say",
-		Description: "Oasis song from (What's the Story) Morning Glory? album.",
-	}
-
-	invalidVideo := &model.Video{
-		Title:       "Some Might Say",
-		Description: "Oasis song from (What's the Story) Morning Glory? album.",
-		SourceURL:   "invalidURL",
-	}
-
-	titleVideo := &model.Video{
-		Title: "Some Might Say",
-	}
-
-	descriptionVideo := &model.Video{
-		Description: "Oasis song from (What's the Story) Morning Glory? album.",
-	}
-
-	emptyVideo := &model.Video{}
-
-	mockedAssets := new(muxinc.MockedAssets)
-	mockedVideos := new(axiom.MockedVideos)
-
-	videos := usecase.NewVideoUseCase(mockedAssets, mockedVideos)
-
-	controller := NewVideoController(videos)
-
-	expectedComplete := `{"id":"fcdf5f4e-b086-4b52-8714-bf3623186185","title":"Some Might Say","description":"Oasis song from (What's the Story) Morning Glory? album.","asset":{"id":"5iNFJg9dIww2AgUryhgghbP00Dc4ogoxn00gzitOdjICg"}}`
-	expectedIncomplete := `{"id":"fcdf5f4e-b086-4b52-8714-bf3623186185","title":"Some Might Say","description":"Oasis song from (What's the Story) Morning Glory? album."}`
-	expectedUnprocessable := `{"message":"Unprocessable Entity","status":422}`
-	expectedBadRequest := `{"message":"Invalid request","status":400}`
 
 	tests := []struct {
 		name         string
 		expectedCode int
 		expectedBody string
-		body         *model.Video
+		body         string
+		video        model.Video
+		wantedError  error
 	}{
-		{"Valid", http.StatusCreated, expectedComplete, completeVideo},
-		{"Valid (with source file)", http.StatusCreated, expectedIncomplete, incompleteVideo},
-		{"Invalid Source File URL", http.StatusCreated, expectedIncomplete, invalidVideo},
-		{"Empty description", http.StatusUnprocessableEntity, expectedUnprocessable, titleVideo},
-		{"Empty title", http.StatusUnprocessableEntity, expectedUnprocessable, descriptionVideo},
-		{"Empty body", http.StatusUnprocessableEntity, expectedUnprocessable, emptyVideo},
+		{
+			"Complete",
+			201,
+			`{"title":"Some Might Say","description":"(What's the Story) Morning Glory?","source_url":"https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4"}`,
+			`{"title":"Some Might Say","description":"(What's the Story) Morning Glory?","source_url":"https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4"}`,
+			completeVideo,
+			nil,
+		},
+		{
+			"Video Unprocessable (title)",
+			422,
+			`{"message":"Unprocessable entity","status":422}`,
+			`{"description":"(What's the Story) Morning Glory?"}`,
+			completeVideo,
+			errorcodes.ErrVideoUnprocessable,
+		},
+		{
+			"Error",
+			500,
+			`{"message":"Internal server error","status":500}`,
+			`{"description":"(What's the Story) Morning Glory?"}`,
+			model.Video{},
+			errors.New("failed"),
+		},
+		{
+			"Bad request",
+			400,
+			`{"message":"Bad request","status":400}`,
+			`{"title":23,"description":?",}`,
+			model.Video{},
+			nil,
+		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			output, _ := json.Marshal(tt.body)
-
-			// Create a request to pass to our handler.
-			req, err := http.NewRequest("POST", "/videos", bytes.NewBuffer(output))
-			if err != nil {
-				t.Fatal(err)
+			videos := &mocks.Videos{}
+			vc := &videoController{
+				videos,
 			}
 
-			// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
-			rr := httptest.NewRecorder()
-			handler := http.HandlerFunc(controller.Create)
+			r, _ := http.NewRequest("POST", "/videos", bytes.NewBuffer([]byte(tt.body)))
+			w := httptest.NewRecorder()
 
-			// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-			// directly and pass in our Request and ResponseRecorder.
-			handler.ServeHTTP(rr, req)
+			ctx := r.Context()
+
+			videos.On("Create", ctx, mock.Anything).Return(tt.video, tt.wantedError)
+
+			vc.Create(w, r)
 
 			// Check the content type is what we expect.
 			expected := "application/json; charset=UTF-8"
-			m := rr.Header()
+			m := w.Header()
 			if contentType := m.Get("Content-Type"); contentType != expected {
 				t.Errorf(
 					"handler returned wrong content type: got %v want %v",
@@ -104,7 +91,7 @@ func TestCreate(t *testing.T) {
 			}
 
 			// Check the status code is what we expect.
-			if status := rr.Code; status != tt.expectedCode {
+			if status := w.Code; status != tt.expectedCode {
 				t.Errorf(
 					"handler returned wrong status code: got %v want %v",
 					status,
@@ -113,117 +100,88 @@ func TestCreate(t *testing.T) {
 			}
 
 			// Check the response body is what we expect.
-			if rr.Body.String() != tt.expectedBody {
+			if w.Body.String() != tt.expectedBody {
 				t.Errorf(
 					"handler returned unexpected body: got %v want %v",
-					rr.Body.String(),
+					w.Body.String(),
 					tt.expectedBody,
 				)
 			}
 		})
 	}
-
-	t.Run("Invalid JSON", func(t *testing.T) {
-		invalidJSON := `{"title:Unprocessable Entity","description":422}`
-
-		output, _ := json.Marshal(invalidJSON)
-
-		// Create a request to pass to our handler.
-		req, err := http.NewRequest("POST", "/videos", bytes.NewBuffer(output))
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(controller.Create)
-
-		// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-		// directly and pass in our Request and ResponseRecorder.
-		handler.ServeHTTP(rr, req)
-
-		// Check the content type is what we expect.
-		expected := "application/json; charset=UTF-8"
-		m := rr.Header()
-		if contentType := m.Get("Content-Type"); contentType != expected {
-			t.Errorf(
-				"handler returned wrong content type: got %v want %v",
-				contentType,
-				expected,
-			)
-		}
-
-		// Check the status code is what we expect.
-		if status := rr.Code; status != http.StatusBadRequest {
-			t.Errorf(
-				"handler returned wrong status code: got %v want %v",
-				status,
-				http.StatusBadRequest,
-			)
-		}
-
-		// Check the response body is what we expect.
-		if rr.Body.String() != expectedBadRequest {
-			t.Errorf(
-				"handler returned unexpected body: got %v want %v",
-				rr.Body.String(),
-				expectedBadRequest,
-			)
-		}
-	})
 }
 
-func TestGetByID(t *testing.T) {
-	logger := logrus.New()
-	logger.Out = ioutil.Discard
-
-	ID := "fcdf5f4e-b086-4b52-8714-bf3623186185"
-	IDWithSourceFile := "a9200233-9b62-489c-9cbc-bb37f2922804"
-
-	mockedAssets := new(muxinc.MockedAssets)
-	mockedVideos := new(axiom.MockedVideos)
-
-	videos := usecase.NewVideoUseCase(mockedAssets, mockedVideos)
-
-	controller := NewVideoController(videos)
-
-	expectedComplete := `{"id":"fcdf5f4e-b086-4b52-8714-bf3623186185","title":"Some Might Say","description":"Oasis song from (What's the Story) Morning Glory? album."}`
-	expectedWithSourceFile := `{"id":"a9200233-9b62-489c-9cbc-bb37f2922804","title":"Some Might Say","description":"Oasis song from (What's the Story) Morning Glory? album.","poster":"https://image.mux.com/5iNFJg9dIww2AgUryhgghbP00Dc4ogoxn00gzitOdjICg/thumbnail.png?width=1920\u0026height=1080\u0026smart_crop=true\u0026time=7","thumbnail":"https://image.mux.com/5iNFJg9dIww2AgUryhgghbP00Dc4ogoxn00gzitOdjICg/thumbnail.png?width=640\u0026height=360\u0026smart_crop=true\u0026time=7","sources":[{"src":"https://stream.mux.com/5iNFJg9dIww2AgUryhgghbP00Dc4ogoxn00gzitOdjICg.m3u8","type":"application/x-mpegURL"}]}`
-	expectedNotFound := `{"message":"video not found","status":404}`
-	expectedUnprocessable := `{"message":"Unprocessable Entity","status":422}`
+func Test_videoController_GetByID(t *testing.T) {
+	uuid := "4e5bf8f2-9c50-4576-b9d4-1d1fd0705885"
+	completeVideo := model.Video{
+		ID:          &uuid,
+		Title:       "Some Might Say",
+		Description: "Oasis song from (What's the Story) Morning Glory? album.",
+	}
 
 	tests := []struct {
 		name         string
+		id           string
 		expectedCode int
 		expectedBody string
-		ID           string
+		video        model.Video
+		wantedError  error
 	}{
-		{"Valid", http.StatusOK, expectedComplete, ID},
-		{"Valid (with source file)", http.StatusOK, expectedWithSourceFile, IDWithSourceFile},
-		{"Not found", http.StatusNotFound, expectedNotFound, "xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx"},
-		{"Not UUID", http.StatusUnprocessableEntity, expectedUnprocessable, "xxxxxxxx"},
+		{
+			"Success",
+			"4e5bf8f2-9c50-4576-b9d4-1d1fd0705885",
+			200,
+			`{"id":"4e5bf8f2-9c50-4576-b9d4-1d1fd0705885","title":"Some Might Say","description":"Oasis song from (What's the Story) Morning Glory? album."}`,
+			completeVideo,
+			nil,
+		},
+		{
+			"Bad ID",
+			"123",
+			422,
+			`{"message":"Unprocessable Entity","status":422}`,
+			model.Video{},
+			nil,
+		},
+		{
+			"Not found",
+			"4e5bf8f2-9c50-4576-b9d4-1d1fd0705885",
+			404,
+			`{"message":"Not found","status":404}`,
+			model.Video{},
+			errorcodes.ErrVideoNotFound,
+		},
+		{
+			"Error",
+			"4e5bf8f2-9c50-4576-b9d4-1d1fd0705885",
+			500,
+			`{"message":"Internal server error","status":500}`,
+			model.Video{},
+			errors.New("failed"),
+		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Create a request to pass to our handler.
-			req, err := http.NewRequest("GET", fmt.Sprintf("/videos/%s", tt.ID), nil)
-			if err != nil {
-				t.Fatal(err)
+			videos := &mocks.Videos{}
+			vc := &videoController{
+				videos,
 			}
 
-			// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
-			rr := httptest.NewRecorder()
+			r, _ := http.NewRequest("GET", "/videos/abcd", nil)
+			w := httptest.NewRecorder()
 
-			router := mux.NewRouter()
-			router.HandleFunc("/videos/{id}", controller.GetByID)
+			r = mux.SetURLVars(r, map[string]string{
+				"id": tt.id,
+			})
 
-			// Change to Gorilla Mux router to pass variables
-			router.ServeHTTP(rr, req)
+			ctx := r.Context()
 
+			videos.On("GetByID", ctx, tt.id).Return(tt.video, tt.wantedError)
+
+			vc.GetByID(w, r)
 			// Check the content type is what we expect.
 			expected := "application/json; charset=UTF-8"
-			m := rr.Header()
+			m := w.Header()
 			if contentType := m.Get("Content-Type"); contentType != expected {
 				t.Errorf(
 					"handler returned wrong content type: got %v want %v",
@@ -233,7 +191,7 @@ func TestGetByID(t *testing.T) {
 			}
 
 			// Check the status code is what we expect.
-			if status := rr.Code; status != tt.expectedCode {
+			if status := w.Code; status != tt.expectedCode {
 				t.Errorf(
 					"handler returned wrong status code: got %v want %v",
 					status,
@@ -242,10 +200,10 @@ func TestGetByID(t *testing.T) {
 			}
 
 			// Check the response body is what we expect.
-			if rr.Body.String() != tt.expectedBody {
+			if w.Body.String() != tt.expectedBody {
 				t.Errorf(
 					"handler returned unexpected body: got %v want %v",
-					rr.Body.String(),
+					w.Body.String(),
 					tt.expectedBody,
 				)
 			}
