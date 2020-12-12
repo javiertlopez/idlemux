@@ -37,7 +37,7 @@ func (vc *videoController) Create(w http.ResponseWriter, r *http.Request) {
 		JSONResponse(
 			w, http.StatusBadRequest,
 			Response{
-				Message: "Invalid request",
+				Message: "Bad request",
 				Status:  http.StatusBadRequest,
 			},
 		)
@@ -53,7 +53,7 @@ func (vc *videoController) Create(w http.ResponseWriter, r *http.Request) {
 			JSONResponse(
 				w, http.StatusUnprocessableEntity,
 				Response{
-					Message: err.Error(),
+					Message: "Unprocessable entity",
 					Status:  http.StatusUnprocessableEntity,
 				},
 			)
@@ -63,8 +63,8 @@ func (vc *videoController) Create(w http.ResponseWriter, r *http.Request) {
 		JSONResponse(
 			w, http.StatusInternalServerError,
 			Response{
-				Message: err.Error(),
-				Status:  http.StatusBadRequest,
+				Message: "Internal server error",
+				Status:  http.StatusInternalServerError,
 			},
 		)
 
@@ -103,7 +103,7 @@ func (vc *videoController) GetByID(w http.ResponseWriter, r *http.Request) {
 			JSONResponse(
 				w, http.StatusNotFound,
 				Response{
-					Message: err.Error(),
+					Message: "Not found",
 					Status:  http.StatusNotFound,
 				},
 			)
@@ -114,7 +114,7 @@ func (vc *videoController) GetByID(w http.ResponseWriter, r *http.Request) {
 		JSONResponse(
 			w, http.StatusInternalServerError,
 			Response{
-				Message: err.Error(),
+				Message: "Internal server error",
 				Status:  http.StatusInternalServerError,
 			},
 		)
