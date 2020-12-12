@@ -68,7 +68,9 @@ func (v *videos) GetByID(ctx context.Context, id string) (model.Video, error) {
 	if response.Asset != nil {
 		asset, err := v.assets.GetByID(ctx, response.Asset.ID)
 		if err == nil {
-			response.Asset = nil
+			response.Asset = &model.Asset{
+				ID: asset.ID,
+			}
 			response.Poster = asset.Poster
 			response.Thumbnail = asset.Thumbnail
 			response.Sources = asset.Sources
