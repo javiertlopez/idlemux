@@ -1,8 +1,9 @@
 package router
 
 import (
+	"github.com/javiertlopez/awesome/controller"
+
 	"github.com/gorilla/mux"
-	"github.com/javiertlopez/awesome/pkg/controller"
 )
 
 // New returns a *mux.Router

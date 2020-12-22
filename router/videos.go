@@ -1,7 +1,7 @@
 package router
 
 import (
-	"github.com/javiertlopez/awesome/pkg/controller"
+	"github.com/javiertlopez/awesome/controller"
 
 	"github.com/gorilla/mux"
 )

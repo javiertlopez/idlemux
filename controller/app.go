@@ -19,8 +19,8 @@ type appController struct {
 // NewAppController returns an EventController
 func NewAppController(commit string, version string) AppController {
 	return &appController{
-		commit,
-		version,
+		commit:  commit,
+		version: version,
 	}
 }
 

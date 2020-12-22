@@ -4,11 +4,11 @@ import (
 	"context"
 	"time"
 
-	"github.com/javiertlopez/awesome/pkg/controller"
-	"github.com/javiertlopez/awesome/pkg/repository/axiom"
-	"github.com/javiertlopez/awesome/pkg/repository/muxinc"
-	"github.com/javiertlopez/awesome/pkg/router"
-	"github.com/javiertlopez/awesome/pkg/usecase"
+	"github.com/javiertlopez/awesome/controller"
+	"github.com/javiertlopez/awesome/repository/axiom"
+	"github.com/javiertlopez/awesome/repository/muxinc"
+	"github.com/javiertlopez/awesome/router"
+	"github.com/javiertlopez/awesome/usecase"
 
 	"github.com/gorilla/mux"
 	muxgo "github.com/muxinc/mux-go"
@@ -17,9 +17,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-const (
-	mongoTimeout = 15 * time.Second
-)
+const mongoTimeout = 15 * time.Second
 
 // App holds the handler, and logger
 type App struct {

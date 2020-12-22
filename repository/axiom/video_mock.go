@@ -3,8 +3,8 @@ package axiom
 import (
 	"context"
 
-	"github.com/javiertlopez/awesome/pkg/errorcodes"
-	"github.com/javiertlopez/awesome/pkg/model"
+	"github.com/javiertlopez/awesome/errorcodes"
+	"github.com/javiertlopez/awesome/model"
 
 	"github.com/stretchr/testify/mock"
 )

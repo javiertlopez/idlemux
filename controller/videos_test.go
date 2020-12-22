@@ -7,9 +7,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/javiertlopez/awesome/pkg/errorcodes"
-	mocks "github.com/javiertlopez/awesome/pkg/mocks/usecase"
-	"github.com/javiertlopez/awesome/pkg/model"
+	"github.com/javiertlopez/awesome/errorcodes"
+	mocks "github.com/javiertlopez/awesome/mocks/usecase"
+	"github.com/javiertlopez/awesome/model"
 
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/mock"
@@ -67,7 +67,7 @@ func Test_videoController_Create(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			videos := &mocks.Videos{}
 			vc := &videoController{
-				videos,
+				videos: videos,
 			}
 
 			r, _ := http.NewRequest("POST", "/videos", bytes.NewBuffer([]byte(tt.body)))
@@ -164,7 +164,7 @@ func Test_videoController_GetByID(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			videos := &mocks.Videos{}
 			vc := &videoController{
-				videos,
+				videos: videos,
 			}
 
 			r, _ := http.NewRequest("GET", "/videos/abcd", nil)

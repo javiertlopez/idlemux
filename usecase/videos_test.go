@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"testing"
 
-	mocks "github.com/javiertlopez/awesome/pkg/mocks/repository"
-	"github.com/javiertlopez/awesome/pkg/model"
+	mocks "github.com/javiertlopez/awesome/mocks/repository"
+	"github.com/javiertlopez/awesome/model"
 
 	"github.com/stretchr/testify/mock"
 )
