@@ -1,0 +1,114 @@
+openapi: 3.0.1
+info:
+  title: Awesome library
+  description:
+    "A Video Library"
+  version: 0.5.0
+tags:
+  - name: videos
+    description: Video collection
+paths:
+  /videos:
+    post:
+      tags:
+        - videos
+      summary: Create a new video
+      requestBody:
+        description: Video object that needs to be added to the library
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Video"
+            examples:
+              source:
+                summary: Video with source file
+                value:
+                  title: Some Might Say
+                  description: (What's the Story) Morning Glory?
+                  source_url: https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4
+              ingested:
+                summary: Video already ingested
+                value:
+                  title: Some Might Say
+                  description: (What's the Story) Morning Glory?
+                  asset:
+                    id: dd0f697463174c0ca57800847f8559d7
+        required: true
+      responses:
+        201:
+          description: Created
+          content: {}
+        400:
+          description: Bad request
+          content: {}
+        422:
+          description: Unprocessable entity
+          content: {}
+  /videos/{id}:
+    get:
+      tags:
+        - videos
+      summary: Get a videoby ID
+      description: Returns a single video
+      parameters:
+        - name: id
+          in: path
+          description: Video ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Video"
+        422:
+          description: Invalid ID supplied
+          content: {}
+        404:
+          description: Video not found
+          content: {}
+components:
+  schemas:
+    Video:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        duration:
+          type: number
+          format: float
+        poster:
+          type: string
+        thumbnail:
+          type: string
+        asset:
+          $ref: '#/components/schemas/Asset'
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/Source'
+        created_at:
+          type: string
+          format: date_time
+        updated_at:
+          type: string
+          format: date_time
+    Asset:
+      type: object
+      properties:
+        id:
+          type: string
+    Source:
+      type: object
+      properties:
+        src:
+          type: string
+        type:
+          type: string
