@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/javiertlopez/awesome/pkg/model"
-	"github.com/javiertlopez/awesome/pkg/repository"
+	"github.com/javiertlopez/awesome/model"
+	"github.com/javiertlopez/awesome/repository"
 
 	"github.com/dgrijalva/jwt-go"
 	muxgo "github.com/muxinc/mux-go"

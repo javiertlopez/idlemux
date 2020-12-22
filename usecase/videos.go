@@ -3,9 +3,9 @@ package usecase
 import (
 	"context"
 
-	"github.com/javiertlopez/awesome/pkg/errorcodes"
-	"github.com/javiertlopez/awesome/pkg/model"
-	"github.com/javiertlopez/awesome/pkg/repository"
+	"github.com/javiertlopez/awesome/errorcodes"
+	"github.com/javiertlopez/awesome/model"
+	"github.com/javiertlopez/awesome/repository"
 )
 
 // Videos usecase

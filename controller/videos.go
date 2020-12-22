@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/javiertlopez/awesome/pkg/errorcodes"
-	"github.com/javiertlopez/awesome/pkg/model"
-	"github.com/javiertlopez/awesome/pkg/usecase"
+	"github.com/javiertlopez/awesome/errorcodes"
+	"github.com/javiertlopez/awesome/model"
+	"github.com/javiertlopez/awesome/usecase"
 
 	"github.com/gorilla/mux"
 )
@@ -25,7 +25,7 @@ type videoController struct {
 // NewVideoController returns a VideoController
 func NewVideoController(videos usecase.Videos) VideoController {
 	return &videoController{
-		videos,
+		videos: videos,
 	}
 }
 

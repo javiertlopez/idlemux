@@ -1,4 +1,4 @@
-name: Integration Test
+name: Go
 
 on:
   push:
@@ -30,10 +30,10 @@ jobs:
         fi
 
     - name: Build
-      run: go build -v -o awesome ./pkg
+      run: go build -v .
 
     - name: Generate coverage report
-      run: go test -v ./... -race -coverprofile=coverage.xml -covermode=atomic
+      run: go test -v . -race -coverprofile=coverage.xml -covermode=atomic
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
