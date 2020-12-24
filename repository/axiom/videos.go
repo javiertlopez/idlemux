@@ -23,7 +23,7 @@ type video struct {
 	ID          string    `bson:"_id"`
 	Title       string    `bson:"title"`
 	Description string    `bson:"description"`
-	Duration    *float64  `bson:"duration,omitempty"`
+	Duration    float64   `bson:"duration,omitempty"`
 	AssetID     string    `bson:"asset_id,omitempty"`
 	CreatedAt   time.Time `bson:"createdAt"`
 	UpdatedAt   time.Time `bson:"updatedAt"`
@@ -111,7 +111,7 @@ func (v *videos) GetByID(ctx context.Context, id string) (model.Video, error) {
 
 func (v video) toModel() model.Video {
 	return model.Video{
-		ID:          &v.ID,
+		ID:          v.ID,
 		Title:       v.Title,
 		Description: v.Description,
 		Asset: &model.Asset{

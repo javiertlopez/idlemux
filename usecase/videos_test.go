@@ -34,13 +34,14 @@ func Test_videos_Create(t *testing.T) {
 			true,
 		},
 		{
-			"Video with source",
+			"Video with public source",
 			args{
 				ctx: context.Background(),
 				anyVideo: model.Video{
 					Title:       "Some Might Say",
 					Description: "(What's the Story) Morning Glory?",
 					SourceURL:   "https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4",
+					Policy:      "public",
 				},
 			},
 			model.Video{
@@ -145,7 +146,7 @@ func Test_videos_GetByID(t *testing.T) {
 				id:  uuid,
 			},
 			model.Video{
-				ID: &uuid,
+				ID: uuid,
 				Asset: &model.Asset{
 					ID: "4e5bf8f2-9c50-4576-b9d4-1d1fd0705885",
 				},

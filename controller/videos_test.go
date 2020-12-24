@@ -114,7 +114,7 @@ func Test_videoController_Create(t *testing.T) {
 func Test_videoController_GetByID(t *testing.T) {
 	uuid := "4e5bf8f2-9c50-4576-b9d4-1d1fd0705885"
 	completeVideo := model.Video{
-		ID:          &uuid,
+		ID:          uuid,
 		Title:       "Some Might Say",
 		Description: "Oasis song from (What's the Story) Morning Glory? album.",
 	}
