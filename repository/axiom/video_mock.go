@@ -19,7 +19,7 @@ func (m *MockedVideos) Create(ctx context.Context, anyVideo model.Video) (model.
 	uuid := "fcdf5f4e-b086-4b52-8714-bf3623186185"
 
 	response := model.Video{
-		ID:          &uuid,
+		ID:          uuid,
 		Title:       anyVideo.Title,
 		Description: anyVideo.Description,
 	}
@@ -41,13 +41,13 @@ func (m *MockedVideos) GetByID(ctx context.Context, id string) (model.Video, err
 	switch id {
 	case ID:
 		return model.Video{
-			ID:          &ID,
+			ID:          ID,
 			Title:       "Some Might Say",
 			Description: "Oasis song from (What's the Story) Morning Glory? album.",
 		}, nil
 	case IDWithSourceFile:
 		return model.Video{
-			ID:          &IDWithSourceFile,
+			ID:          IDWithSourceFile,
 			Title:       "Some Might Say",
 			Description: "Oasis song from (What's the Story) Morning Glory? album.",
 			Asset: &model.Asset{
