@@ -27,7 +27,13 @@ type asset struct {
 	data muxgo.Asset
 }
 
-// NewAssetRepo creates new an Videos service object
+// MuxKey struct
+type MuxKey struct {
+	KeyID     string
+	KeySecret string
+}
+
+// NewAssetRepo returns an asset implementation (mux.com)
 func NewAssetRepo(
 	l *logrus.Logger,
 	m *muxgo.APIClient,
@@ -39,6 +45,20 @@ func NewAssetRepo(
 		mux:       m,
 		keyID:     id,
 		keySecret: secret,
+	}
+}
+
+// NewAsset returns an asset implementation (mux.com)
+func NewAsset(
+	l *logrus.Logger,
+	m *muxgo.APIClient,
+	cfg MuxKey,
+) repository.AssetRepo {
+	return &assets{
+		logger:    l,
+		mux:       m,
+		keyID:     cfg.KeyID,
+		keySecret: cfg.KeySecret,
 	}
 }
 
