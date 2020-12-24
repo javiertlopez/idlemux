@@ -39,7 +39,17 @@ func (v *videos) Create(ctx context.Context, anyVideo model.Video) (model.Video,
 
 	// If body contains a Source File URL, send it to Ingestion
 	if len(anyVideo.SourceURL) > 0 {
-		assetID, err := v.assets.Create(ctx, anyVideo.SourceURL, true)
+		var isPublic bool
+		switch anyVideo.Policy {
+		case "public":
+			isPublic = true
+		case "signed":
+			isPublic = false
+		default:
+			return model.Video{}, errorcodes.ErrIngestionFailed
+		}
+
+		assetID, err := v.assets.Create(ctx, anyVideo.SourceURL, isPublic)
 		if err == nil {
 			anyVideo.Asset = &model.Asset{
 				ID: assetID,
