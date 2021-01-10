@@ -32,18 +32,16 @@ type video struct {
 // videos struct holds the logger and MongoDB client
 type videos struct {
 	db     string
-	mongo  *mongo.Client
+	mongo  *mongo.Database
 	logger *logrus.Logger
 }
 
 // NewVideoRepo method
 func NewVideoRepo(
 	l *logrus.Logger,
-	db string,
-	m *mongo.Client,
+	m *mongo.Database,
 ) repository.VideoRepo {
 	return &videos{
-		db:     db,
 		mongo:  m,
 		logger: l,
 	}
@@ -51,7 +49,7 @@ func NewVideoRepo(
 
 // Create video creates a new ID, stores the video and returns the new object
 func (v *videos) Create(ctx context.Context, anyVideo model.Video) (model.Video, error) {
-	collection := v.mongo.Database(v.db).Collection(Collection)
+	collection := v.mongo.Collection(Collection)
 	time := time.Now()
 
 	uuid := guuid.New().String()
@@ -86,7 +84,7 @@ func (v *videos) Create(ctx context.Context, anyVideo model.Video) (model.Video,
 func (v *videos) GetByID(ctx context.Context, id string) (model.Video, error) {
 	var response video
 
-	collection := v.mongo.Database(v.db).Collection(Collection)
+	collection := v.mongo.Collection(Collection)
 
 	filter := bson.M{"_id": id}
 

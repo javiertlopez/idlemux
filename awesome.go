@@ -17,6 +17,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+// Database keeps the database name
+const Database = "delivery"
+
 const mongoTimeout = 15 * time.Second
 
 // App holds the handler, and logger
@@ -30,7 +33,6 @@ type App struct {
 type AppConfig struct {
 	Commit         string
 	Version        string
-	MongoDB        string
 	MongoURI       string
 	MuxTokenID     string
 	MuxTokenSecret string
@@ -52,6 +54,7 @@ func New(config AppConfig, logger *logrus.Logger) App {
 	if err != nil {
 		logger.Fatal(err)
 	}
+	db := client.Database(Database)
 
 	// Init mux repository
 	assetsRepo := muxinc.NewAssetRepo(
@@ -66,7 +69,7 @@ func New(config AppConfig, logger *logrus.Logger) App {
 	)
 
 	// Init axiom repository
-	videosRepo := axiom.NewVideoRepo(logger, config.MongoDB, client)
+	videosRepo := axiom.NewVideoRepo(logger, db)
 
 	// Init usecase
 	videos := usecase.NewVideoUseCase(assetsRepo, videosRepo)
