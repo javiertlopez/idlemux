@@ -99,7 +99,7 @@ func Test_ingestion_Create(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ar := &mocks.AssetRepo{}
 			vr := &mocks.VideoRepo{}
-			u := &videos{
+			u := &ingestion{
 				ar,
 				vr,
 			}

@@ -58,10 +58,7 @@ func Test_delivery_GetByID(t *testing.T) {
 				id:  uuid,
 			},
 			model.Video{
-				ID: uuid,
-				Asset: &model.Asset{
-					ID: "4e5bf8f2-9c50-4576-b9d4-1d1fd0705885",
-				},
+				ID:        uuid,
 				Poster:    "https://image.mux.com/5iNFJg9dIww2AgUryhgghbP00Dc4ogoxn00gzitOdjICg/thumbnail.png?width=1920\u0026height=1080\u0026smart_crop=true\u0026time=7",
 				Thumbnail: "https://image.mux.com/5iNFJg9dIww2AgUryhgghbP00Dc4ogoxn00gzitOdjICg/thumbnail.png?width=640\u0026height=360\u0026smart_crop=true\u0026time=7",
 				Sources: []model.Source{
@@ -78,7 +75,7 @@ func Test_delivery_GetByID(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ar := &mocks.AssetRepo{}
 			vr := &mocks.VideoRepo{}
-			u := &videos{
+			u := &delivery{
 				ar,
 				vr,
 			}

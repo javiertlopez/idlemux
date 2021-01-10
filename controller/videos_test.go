@@ -65,9 +65,9 @@ func Test_videoController_Create(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			videos := &mocks.Videos{}
+			ingestion := &mocks.Ingestion{}
 			vc := &videoController{
-				videos: videos,
+				ingestion: ingestion,
 			}
 
 			r, _ := http.NewRequest("POST", "/videos", bytes.NewBuffer([]byte(tt.body)))
@@ -75,7 +75,7 @@ func Test_videoController_Create(t *testing.T) {
 
 			ctx := r.Context()
 
-			videos.On("Create", ctx, mock.Anything).Return(tt.video, tt.wantedError)
+			ingestion.On("Create", ctx, mock.Anything).Return(tt.video, tt.wantedError)
 
 			vc.Create(w, r)
 
@@ -162,9 +162,9 @@ func Test_videoController_GetByID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			videos := &mocks.Videos{}
+			delivery := &mocks.Delivery{}
 			vc := &videoController{
-				videos: videos,
+				delivery: delivery,
 			}
 
 			r, _ := http.NewRequest("GET", "/videos/abcd", nil)
@@ -176,7 +176,7 @@ func Test_videoController_GetByID(t *testing.T) {
 
 			ctx := r.Context()
 
-			videos.On("GetByID", ctx, tt.id).Return(tt.video, tt.wantedError)
+			delivery.On("GetByID", ctx, tt.id).Return(tt.video, tt.wantedError)
 
 			vc.GetByID(w, r)
 			// Check the content type is what we expect.

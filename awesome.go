@@ -26,7 +26,6 @@ const mongoTimeout = 15 * time.Second
 type App struct {
 	logger *logrus.Logger
 	router *mux.Router
-	config AppConfig
 }
 
 // AppConfig struct with configuration variables
@@ -57,7 +56,7 @@ func New(config AppConfig, logger *logrus.Logger) App {
 	db := client.Database(Database)
 
 	// Init mux repository
-	assetsRepo := muxinc.NewAssetRepo(
+	assets := muxinc.NewAssetRepo(
 		logger,
 		muxgo.NewAPIClient(
 			muxgo.NewConfiguration(
@@ -69,24 +68,26 @@ func New(config AppConfig, logger *logrus.Logger) App {
 	)
 
 	// Init axiom repository
-	videosRepo := axiom.NewVideoRepo(logger, db)
+	videos := axiom.NewVideoRepo(logger, db)
 
-	// Init usecase
-	videos := usecase.NewVideoUseCase(assetsRepo, videosRepo)
+	// Init delivery usecase
+	delivery := usecase.NewDelivery(assets, videos)
+
+	// Init ingestion usecase
+	ingestion := usecase.NewIngestion(assets, videos)
 
 	// Init appController
 	appController := controller.NewAppController(config.Commit, config.Version)
 
 	// Init videoController
-	videoController := controller.NewVideoController(videos)
+	videoController := controller.NewVideoController(delivery, ingestion)
 
 	// Setup router
 	router := router.New(appController, videoController)
 
 	return App{
-		logger,
-		router,
-		config,
+		logger: logger,
+		router: router,
 	}
 }
 

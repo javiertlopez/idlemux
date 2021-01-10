@@ -19,13 +19,18 @@ type VideoController interface {
 
 // videoController struct holds the usecase
 type videoController struct {
-	videos usecase.Videos
+	delivery  usecase.Delivery
+	ingestion usecase.Ingestion
 }
 
 // NewVideoController returns a VideoController
-func NewVideoController(videos usecase.Videos) VideoController {
+func NewVideoController(
+	delivery usecase.Delivery,
+	ingestion usecase.Ingestion,
+) VideoController {
 	return &videoController{
-		videos: videos,
+		delivery:  delivery,
+		ingestion: ingestion,
 	}
 }
 
@@ -45,7 +50,7 @@ func (vc *videoController) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	response, err := vc.videos.Create(r.Context(), video)
+	response, err := vc.ingestion.Create(r.Context(), video)
 
 	if err != nil {
 		// Look for Custom Error
@@ -95,7 +100,7 @@ func (vc *videoController) GetByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response, err := vc.videos.GetByID(r.Context(), id)
+	response, err := vc.delivery.GetByID(r.Context(), id)
 
 	if err != nil {
 		// Look for Custom Error
