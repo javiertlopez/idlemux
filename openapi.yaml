@@ -3,7 +3,7 @@ info:
   title: Awesome library
   description:
     "A Video Library"
-  version: 0.5.0
+  version: 0.6.1
 tags:
   - name: videos
     description: Video collection
