@@ -9,7 +9,7 @@ import (
 	"github.com/javiertlopez/awesome/model"
 	"github.com/javiertlopez/awesome/repository"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v4"
 	muxgo "github.com/muxinc/mux-go"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
