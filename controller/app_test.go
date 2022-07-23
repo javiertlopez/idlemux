@@ -19,8 +19,10 @@ func TestHealthz(t *testing.T) {
 	logger.Out = ioutil.Discard
 
 	// Create an app
-	controller := NewAppController(commit, version)
-
+	controller := controller{
+		commit:  commit,
+		version: version,
+	}
 	// Create a request to pass to our handler.
 	req, err := http.NewRequest("GET", "/app/health", nil)
 	if err != nil {
@@ -71,7 +73,10 @@ func TestStatusz(t *testing.T) {
 	logger.Out = ioutil.Discard
 
 	// Create an app
-	controller := NewAppController(commit, version)
+	controller := controller{
+		commit:  commit,
+		version: version,
+	}
 
 	// Create a request to pass to our handler.
 	req, err := http.NewRequest("GET", "/app/statusz", nil)

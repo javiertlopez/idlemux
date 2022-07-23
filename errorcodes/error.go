@@ -12,4 +12,4 @@ var ErrAssetNotFound = errors.New("asset not found")
 var ErrIngestionFailed = errors.New("ingestion failed")
 
 // ErrVideoUnprocessable definition
-var ErrVideoUnprocessable = errors.New("Unprocessable Entity")
+var ErrVideoUnprocessable = errors.New("unprocessable Entity")

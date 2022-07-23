@@ -7,13 +7,17 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/javiertlopez/awesome/errorcodes"
-	mocks "github.com/javiertlopez/awesome/mocks/usecase"
-	"github.com/javiertlopez/awesome/model"
-
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/mock"
+
+	"github.com/javiertlopez/awesome/controller/mocks"
+	"github.com/javiertlopez/awesome/errorcodes"
+	"github.com/javiertlopez/awesome/model"
 )
+
+// Generate mocks
+// mockery --keeptree --name=Delivery --dir=controller --output=controller/mocks
+// mockery --keeptree --name=Ingestion --dir=controller --output=controller/mocks
 
 func Test_videoController_Create(t *testing.T) {
 	completeVideo := model.Video{
@@ -66,7 +70,7 @@ func Test_videoController_Create(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ingestion := &mocks.Ingestion{}
-			vc := &videoController{
+			controller := &controller{
 				ingestion: ingestion,
 			}
 
@@ -77,7 +81,7 @@ func Test_videoController_Create(t *testing.T) {
 
 			ingestion.On("Create", ctx, mock.Anything).Return(tt.video, tt.wantedError)
 
-			vc.Create(w, r)
+			controller.Create(w, r)
 
 			// Check the content type is what we expect.
 			expected := "application/json; charset=UTF-8"
@@ -163,7 +167,7 @@ func Test_videoController_GetByID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			delivery := &mocks.Delivery{}
-			vc := &videoController{
+			controller := &controller{
 				delivery: delivery,
 			}
 
@@ -178,7 +182,7 @@ func Test_videoController_GetByID(t *testing.T) {
 
 			delivery.On("GetByID", ctx, tt.id).Return(tt.video, tt.wantedError)
 
-			vc.GetByID(w, r)
+			controller.GetByID(w, r)
 			// Check the content type is what we expect.
 			expected := "application/json; charset=UTF-8"
 			m := w.Header()

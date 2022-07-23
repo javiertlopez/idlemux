@@ -6,9 +6,12 @@ import (
 	"reflect"
 	"testing"
 
-	mocks "github.com/javiertlopez/awesome/mocks/repository"
 	"github.com/javiertlopez/awesome/model"
+	"github.com/javiertlopez/awesome/usecase/mocks"
 )
+
+// Generate mocks
+// mockery --keeptree --name=Videos --dir=usecase --output=usecase/mocks
 
 func Test_delivery_GetByID(t *testing.T) {
 	uuid := "4e5bf8f2-9c50-4576-b9d4-1d1fd0705885"
@@ -73,22 +76,22 @@ func Test_delivery_GetByID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ar := &mocks.AssetRepo{}
-			vr := &mocks.VideoRepo{}
-			u := &delivery{
-				ar,
-				vr,
+			assets := &mocks.Assets{}
+			videos := &mocks.Videos{}
+			usecase := &delivery{
+				assets,
+				videos,
 			}
 
 			if tt.wantErr {
-				ar.On("GetByID", tt.args.ctx, tt.args.id).Return(model.Asset{}, errors.New("failed"))
-				vr.On("GetByID", tt.args.ctx, tt.args.id).Return(model.Video{}, errors.New("failed"))
+				assets.On("GetByID", tt.args.ctx, tt.args.id).Return(model.Asset{}, errors.New("failed"))
+				videos.On("GetByID", tt.args.ctx, tt.args.id).Return(model.Video{}, errors.New("failed"))
 			} else {
-				ar.On("GetByID", tt.args.ctx, tt.args.id).Return(asset, nil)
-				vr.On("GetByID", tt.args.ctx, tt.args.id).Return(tt.want, nil)
+				assets.On("GetByID", tt.args.ctx, tt.args.id).Return(asset, nil)
+				videos.On("GetByID", tt.args.ctx, tt.args.id).Return(tt.want, nil)
 			}
 
-			got, err := u.GetByID(tt.args.ctx, tt.args.id)
+			got, err := usecase.GetByID(tt.args.ctx, tt.args.id)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("delivery.GetByID() error = %v, wantErr %v", err, tt.wantErr)
 				return

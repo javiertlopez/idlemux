@@ -8,14 +8,14 @@ Awesome is a REST API that stores a Video Library in Mongo Atlas and Mux.com for
 
 ### Requirements
 
-- github.com/golang/go go1.15.6
-- github.com/dgrijalva/jwt-go v3.2.0
-- github.com/google/uuid v1.1.5
+- github.com/golang/go go1.18.4
+- github.com/golang-jwt/jwt/v4 v4.4.2
+- github.com/google/uuid v1.3.0
 - github.com/gorilla/mux v1.8.0
-- github.com/muxinc/mux-go v0.11.0
-- github.com/sirupsen/logrus v1.7.0
-- github.com/stretchr/testify v1.7.0
-- go.mongodb.org/mongo-driver v1.4.4
+- github.com/muxinc/mux-go/v4 v4.2.3
+- github.com/sirupsen/logrus v1.9.0
+- github.com/stretchr/testify v1.8.0
+- go.mongodb.org/mongo-driver v1.10.0
 
 ## Test and build
 
@@ -106,4 +106,4 @@ func main() {
 
 ## License
 
-Licensed under [MIT License](LICENSE). © 2021 Hiram Torres Lopez.
+Licensed under [MIT License](LICENSE). © 2022 Hiram Torres Lopez.

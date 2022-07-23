@@ -4,15 +4,13 @@ import (
 	"context"
 	"time"
 
-	"github.com/javiertlopez/awesome/errorcodes"
-	"github.com/javiertlopez/awesome/model"
-	"github.com/javiertlopez/awesome/repository"
-
 	guuid "github.com/google/uuid"
 	"github.com/sirupsen/logrus"
-	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+
+	"github.com/javiertlopez/awesome/errorcodes"
+	"github.com/javiertlopez/awesome/model"
 )
 
 // Collection keeps the collection name
@@ -31,16 +29,15 @@ type video struct {
 
 // videos struct holds the logger and MongoDB client
 type videos struct {
-	db     string
 	mongo  *mongo.Database
 	logger *logrus.Logger
 }
 
 // NewVideoRepo method
-func NewVideoRepo(
+func New(
 	l *logrus.Logger,
 	m *mongo.Database,
-) repository.VideoRepo {
+) *videos {
 	return &videos{
 		mongo:  m,
 		logger: l,
@@ -48,7 +45,7 @@ func NewVideoRepo(
 }
 
 // Create video creates a new ID, stores the video and returns the new object
-func (v *videos) Create(ctx context.Context, anyVideo model.Video) (model.Video, error) {
+func (v videos) Create(ctx context.Context, anyVideo model.Video) (model.Video, error) {
 	collection := v.mongo.Collection(Collection)
 	time := time.Now()
 
@@ -68,7 +65,7 @@ func (v *videos) Create(ctx context.Context, anyVideo model.Video) (model.Video,
 
 	_, err := collection.InsertOne(ctx, insert)
 	if err != nil {
-		v.logger.WithFields(log.Fields{
+		v.logger.WithFields(logrus.Fields{
 			"step": "collection.InsertOne",
 			"func": "func (v *videos) Insert",
 			"uuid": uuid,
@@ -81,7 +78,7 @@ func (v *videos) Create(ctx context.Context, anyVideo model.Video) (model.Video,
 }
 
 // GetByID retrieves a video with the ID
-func (v *videos) GetByID(ctx context.Context, id string) (model.Video, error) {
+func (v videos) GetByID(ctx context.Context, id string) (model.Video, error) {
 	var response video
 
 	collection := v.mongo.Collection(Collection)
@@ -91,7 +88,7 @@ func (v *videos) GetByID(ctx context.Context, id string) (model.Video, error) {
 	err := collection.FindOne(ctx, filter).Decode(&response)
 
 	if err != nil {
-		v.logger.WithFields(log.Fields{
+		v.logger.WithFields(logrus.Fields{
 			"step": "collection.FindOne",
 			"func": "func (v *videos) GetByID",
 			"id":   id,

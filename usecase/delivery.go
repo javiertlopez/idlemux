@@ -4,32 +4,26 @@ import (
 	"context"
 
 	"github.com/javiertlopez/awesome/model"
-	"github.com/javiertlopez/awesome/repository"
 )
 
-// Delivery usecase
-type Delivery interface {
-	GetByID(ctx context.Context, id string) (model.Video, error)
-}
-
 type delivery struct {
-	assets repository.AssetRepo
-	videos repository.VideoRepo
+	assets Assets
+	videos Videos
 }
 
-// NewDelivery returns the usecase implementation
-func NewDelivery(
-	a repository.AssetRepo,
-	v repository.VideoRepo,
-) Delivery {
-	return &delivery{
+// Delivery returns the usecase implementation
+func Delivery(
+	a Assets,
+	v Videos,
+) delivery {
+	return delivery{
 		assets: a,
 		videos: v,
 	}
 }
 
 // GetByID methods
-func (u *delivery) GetByID(ctx context.Context, id string) (model.Video, error) {
+func (u delivery) GetByID(ctx context.Context, id string) (model.Video, error) {
 	response, err := u.videos.GetByID(ctx, id)
 
 	if err != nil {

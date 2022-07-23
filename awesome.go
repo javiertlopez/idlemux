@@ -4,23 +4,23 @@ import (
 	"context"
 	"time"
 
+	"github.com/gorilla/mux"
+	muxgo "github.com/muxinc/mux-go/v4"
+	"github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+
 	"github.com/javiertlopez/awesome/controller"
 	"github.com/javiertlopez/awesome/repository/axiom"
 	"github.com/javiertlopez/awesome/repository/muxinc"
 	"github.com/javiertlopez/awesome/router"
 	"github.com/javiertlopez/awesome/usecase"
-
-	"github.com/gorilla/mux"
-	muxgo "github.com/muxinc/mux-go"
-	"github.com/sirupsen/logrus"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// Database keeps the database name
-const Database = "delivery"
-
-const mongoTimeout = 15 * time.Second
+const (
+	Database     = "delivery"       // Database keeps the database name
+	mongoTimeout = 15 * time.Second // mongotimeout
+)
 
 // App holds the handler, and logger
 type App struct {
@@ -37,6 +37,7 @@ type AppConfig struct {
 	MuxTokenSecret string
 	MuxKeyID       string
 	MuxKeySecret   string
+	Test           bool
 }
 
 // New returns an App
@@ -56,34 +57,34 @@ func New(config AppConfig, logger *logrus.Logger) App {
 	db := client.Database(Database)
 
 	// Init mux repository
-	assets := muxinc.NewAssetRepo(
+	assets := muxinc.New(
 		logger,
 		muxgo.NewAPIClient(
 			muxgo.NewConfiguration(
 				muxgo.WithBasicAuth(config.MuxTokenID, config.MuxTokenSecret),
 			),
 		),
-		config.MuxKeyID,
-		config.MuxKeySecret,
+		muxinc.Config{
+			KeyID:     config.MuxKeyID,
+			KeySecret: config.MuxKeySecret,
+			Test:      config.Test,
+		},
 	)
 
 	// Init axiom repository
-	videos := axiom.NewVideoRepo(logger, db)
+	videos := axiom.New(logger, db)
 
 	// Init delivery usecase
-	delivery := usecase.NewDelivery(assets, videos)
+	delivery := usecase.Delivery(assets, videos)
 
 	// Init ingestion usecase
-	ingestion := usecase.NewIngestion(assets, videos)
+	ingestion := usecase.Ingestion(assets, videos)
 
-	// Init appController
-	appController := controller.NewAppController(config.Commit, config.Version)
-
-	// Init videoController
-	videoController := controller.NewVideoController(delivery, ingestion)
+	// Init controller
+	controller := controller.New(config.Commit, config.Version, delivery, ingestion)
 
 	// Setup router
-	router := router.New(appController, videoController)
+	router := router.New(controller)
 
 	return App{
 		logger: logger,
