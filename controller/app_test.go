@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -16,7 +16,7 @@ const (
 
 func TestHealthz(t *testing.T) {
 	logger := logrus.New()
-	logger.Out = ioutil.Discard
+	logger.Out = io.Discard
 
 	// Create an app
 	controller := controller{
@@ -70,7 +70,7 @@ func TestHealthz(t *testing.T) {
 
 func TestStatusz(t *testing.T) {
 	logger := logrus.New()
-	logger.Out = ioutil.Discard
+	logger.Out = io.Discard
 
 	// Create an app
 	controller := controller{
