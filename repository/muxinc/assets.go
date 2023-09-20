@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
 	muxgo "github.com/muxinc/mux-go/v4"
 	"github.com/sirupsen/logrus"
 
