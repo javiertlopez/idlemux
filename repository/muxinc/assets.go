@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	muxgo "github.com/muxinc/mux-go/v4"
+	muxgo "github.com/muxinc/mux-go/v5"
 	"github.com/sirupsen/logrus"
 
 	"github.com/javiertlopez/awesome/model"
