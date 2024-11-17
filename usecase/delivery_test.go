@@ -3,17 +3,22 @@ package usecase
 import (
 	"context"
 	"errors"
+	"io"
 	"reflect"
 	"testing"
 
 	"github.com/javiertlopez/awesome/model"
 	"github.com/javiertlopez/awesome/usecase/mocks"
+	"github.com/sirupsen/logrus"
 )
 
 // Generate mocks
 // mockery --keeptree --name=Videos --dir=usecase --output=usecase/mocks
 
 func Test_delivery_GetByID(t *testing.T) {
+	logger := logrus.New()
+	logger.Out = io.Discard
+
 	uuid := "4e5bf8f2-9c50-4576-b9d4-1d1fd0705885"
 	asset := model.Asset{
 		ID:        uuid,
@@ -81,6 +86,7 @@ func Test_delivery_GetByID(t *testing.T) {
 			usecase := &delivery{
 				assets,
 				videos,
+				logger,
 			}
 
 			if tt.wantErr {

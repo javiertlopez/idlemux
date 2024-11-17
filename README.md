@@ -6,17 +6,6 @@ Awesome is a REST API that stores a Video Library in Mongo Atlas and Mux.com for
 
 ## Getting started
 
-### Requirements
-
-- github.com/golang/go go1.22
-- github.com/golang-jwt/jwt/v5 v5.2.0
-- github.com/google/uuid v1.6.0
-- github.com/gorilla/mux v1.8.1
-- github.com/muxinc/mux-go/v5 v5.2.0
-- github.com/sirupsen/logrus v1.9.3
-- github.com/stretchr/testify v1.8.4
-- go.mongodb.org/mongo-driverv1.13.1
-
 ## Test and build
 
 Test the app:

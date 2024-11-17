@@ -75,7 +75,7 @@ func New(config AppConfig, logger *logrus.Logger) App {
 	videos := axiom.New(logger, db)
 
 	// Init delivery usecase
-	delivery := usecase.Delivery(assets, videos)
+	delivery := usecase.Delivery(assets, videos, logger)
 
 	// Init ingestion usecase
 	ingestion := usecase.Ingestion(assets, videos)
