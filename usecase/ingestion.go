@@ -5,32 +5,26 @@ import (
 
 	"github.com/javiertlopez/awesome/errorcodes"
 	"github.com/javiertlopez/awesome/model"
-	"github.com/javiertlopez/awesome/repository"
 )
 
-// Ingestion usecase
-type Ingestion interface {
-	Create(ctx context.Context, anyVideo model.Video) (model.Video, error)
-}
-
 type ingestion struct {
-	assets repository.AssetRepo
-	videos repository.VideoRepo
+	assets Assets
+	videos Videos
 }
 
-// NewIngestion returns the usecase implementation
-func NewIngestion(
-	a repository.AssetRepo,
-	v repository.VideoRepo,
-) Ingestion {
-	return &ingestion{
+// Ingestion returns the usecase implementation
+func Ingestion(
+	a Assets,
+	v Videos,
+) ingestion {
+	return ingestion{
 		assets: a,
 		videos: v,
 	}
 }
 
 // Create method
-func (u *ingestion) Create(ctx context.Context, anyVideo model.Video) (model.Video, error) {
+func (u ingestion) Create(ctx context.Context, anyVideo model.Video) (model.Video, error) {
 	// Title and Description are mandatory fields
 	if len(anyVideo.Title) == 0 || len(anyVideo.Description) == 0 {
 		return model.Video{}, errorcodes.ErrVideoUnprocessable
@@ -48,11 +42,9 @@ func (u *ingestion) Create(ctx context.Context, anyVideo model.Video) (model.Vid
 			return model.Video{}, errorcodes.ErrIngestionFailed
 		}
 
-		assetID, err := u.assets.Create(ctx, anyVideo.SourceURL, isPublic)
+		asset, err := u.assets.Create(ctx, anyVideo.SourceURL, isPublic)
 		if err == nil {
-			anyVideo.Asset = &model.Asset{
-				ID: assetID,
-			}
+			anyVideo.Asset = &asset
 		}
 	}
 

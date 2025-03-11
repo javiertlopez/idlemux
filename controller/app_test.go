@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -16,11 +16,13 @@ const (
 
 func TestHealthz(t *testing.T) {
 	logger := logrus.New()
-	logger.Out = ioutil.Discard
+	logger.Out = io.Discard
 
 	// Create an app
-	controller := NewAppController(commit, version)
-
+	controller := controller{
+		commit:  commit,
+		version: version,
+	}
 	// Create a request to pass to our handler.
 	req, err := http.NewRequest("GET", "/app/health", nil)
 	if err != nil {
@@ -68,10 +70,13 @@ func TestHealthz(t *testing.T) {
 
 func TestStatusz(t *testing.T) {
 	logger := logrus.New()
-	logger.Out = ioutil.Discard
+	logger.Out = io.Discard
 
 	// Create an app
-	controller := NewAppController(commit, version)
+	controller := controller{
+		commit:  commit,
+		version: version,
+	}
 
 	// Create a request to pass to our handler.
 	req, err := http.NewRequest("GET", "/app/statusz", nil)

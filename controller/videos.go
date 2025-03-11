@@ -4,38 +4,14 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/gorilla/mux"
+
 	"github.com/javiertlopez/awesome/errorcodes"
 	"github.com/javiertlopez/awesome/model"
-	"github.com/javiertlopez/awesome/usecase"
-
-	"github.com/gorilla/mux"
 )
 
-// VideoController handles the HTTP requests
-type VideoController interface {
-	Create(w http.ResponseWriter, r *http.Request)
-	GetByID(w http.ResponseWriter, r *http.Request)
-}
-
-// videoController struct holds the usecase
-type videoController struct {
-	delivery  usecase.Delivery
-	ingestion usecase.Ingestion
-}
-
-// NewVideoController returns a VideoController
-func NewVideoController(
-	delivery usecase.Delivery,
-	ingestion usecase.Ingestion,
-) VideoController {
-	return &videoController{
-		delivery:  delivery,
-		ingestion: ingestion,
-	}
-}
-
 // Create controller
-func (vc *videoController) Create(w http.ResponseWriter, r *http.Request) {
+func (c controller) Create(w http.ResponseWriter, r *http.Request) {
 	var video model.Video
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&video); err != nil {
@@ -50,7 +26,7 @@ func (vc *videoController) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	response, err := vc.ingestion.Create(r.Context(), video)
+	response, err := c.ingestion.Create(r.Context(), video)
 
 	if err != nil {
 		// Look for Custom Error
@@ -84,7 +60,7 @@ func (vc *videoController) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetByID controller
-func (vc *videoController) GetByID(w http.ResponseWriter, r *http.Request) {
+func (c controller) GetByID(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
@@ -100,7 +76,7 @@ func (vc *videoController) GetByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response, err := vc.delivery.GetByID(r.Context(), id)
+	response, err := c.delivery.GetByID(r.Context(), id)
 
 	if err != nil {
 		// Look for Custom Error

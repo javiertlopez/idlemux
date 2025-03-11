@@ -1,4 +1,4 @@
-package repository
+package usecase
 
 import (
 	"context"
@@ -6,14 +6,14 @@ import (
 	"github.com/javiertlopez/awesome/model"
 )
 
-// AssetRepo interface
-type AssetRepo interface {
-	Create(ctx context.Context, source string, public bool) (string, error)
+// Assets interface
+type Assets interface {
+	Create(ctx context.Context, source string, public bool) (model.Asset, error)
 	GetByID(ctx context.Context, id string) (model.Asset, error)
 }
 
-// VideoRepo interface
-type VideoRepo interface {
+// Videos interface
+type Videos interface {
 	Create(ctx context.Context, anyVideo model.Video) (model.Video, error)
 	GetByID(ctx context.Context, id string) (model.Video, error)
 }

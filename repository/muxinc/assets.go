@@ -6,13 +6,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/javiertlopez/awesome/model"
-	"github.com/javiertlopez/awesome/repository"
-
-	"github.com/dgrijalva/jwt-go"
-	muxgo "github.com/muxinc/mux-go"
+	"github.com/golang-jwt/jwt/v5"
+	muxgo "github.com/muxinc/mux-go/v5"
 	"github.com/sirupsen/logrus"
-	log "github.com/sirupsen/logrus"
+
+	"github.com/javiertlopez/awesome/model"
 )
 
 // assets struct
@@ -21,50 +19,39 @@ type assets struct {
 	mux       *muxgo.APIClient
 	keyID     string
 	keySecret string
+	test      bool
 }
 
+// asset struct
 type asset struct {
 	data muxgo.Asset
 }
 
-// MuxKey struct
-type MuxKey struct {
+// Config struct
+type Config struct {
 	KeyID     string
 	KeySecret string
-}
-
-// NewAssetRepo returns an asset implementation (mux.com)
-func NewAssetRepo(
-	l *logrus.Logger,
-	m *muxgo.APIClient,
-	id string,
-	secret string,
-) repository.AssetRepo {
-	return &assets{
-		logger:    l,
-		mux:       m,
-		keyID:     id,
-		keySecret: secret,
-	}
+	Test      bool
 }
 
 // NewAsset returns an asset implementation (mux.com)
-func NewAsset(
+func New(
 	l *logrus.Logger,
 	m *muxgo.APIClient,
-	cfg MuxKey,
-) repository.AssetRepo {
-	return &assets{
+	cfg Config,
+) assets {
+	return assets{
 		logger:    l,
 		mux:       m,
 		keyID:     cfg.KeyID,
 		keySecret: cfg.KeySecret,
+		test:      cfg.Test,
 	}
 }
 
 // Ingest send a source file url to mux.com
 // Returns a string Asset ID
-func (a *assets) Create(ctx context.Context, source string, public bool) (string, error) {
+func (a assets) Create(ctx context.Context, source string, public bool) (model.Asset, error) {
 	var policy []muxgo.PlaybackPolicy
 
 	if public {
@@ -80,23 +67,26 @@ func (a *assets) Create(ctx context.Context, source string, public bool) (string
 			},
 		},
 		PlaybackPolicy: policy,
+		Test:           a.test,
 	})
 
 	if err != nil {
-		a.logger.WithFields(log.Fields{
+		a.logger.WithFields(logrus.Fields{
 			"step":   "AssetsApi.CreateAsset",
-			"func":   "func (a *assets) Ingest",
+			"func":   "Create",
 			"source": source,
 		}).Error(err.Error())
 
-		return "", err
+		return model.Asset{}, err
 	}
 
-	return asset.Data.Id, nil
+	return model.Asset{
+		ID: asset.Data.Id,
+	}, nil
 }
 
 // GetByID retrieves an asset from Mux.com by Asset ID
-func (a *assets) GetByID(ctx context.Context, id string) (model.Asset, error) {
+func (a assets) GetByID(ctx context.Context, id string) (model.Asset, error) {
 	response, err := a.mux.AssetsApi.GetAsset(id)
 
 	if err != nil {
