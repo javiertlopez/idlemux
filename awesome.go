@@ -1,14 +1,13 @@
 package awesome
 
 import (
-	"context"
 	"time"
 
 	"github.com/gorilla/mux"
 	muxgo "github.com/muxinc/mux-go/v5"
 	"github.com/sirupsen/logrus"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 
 	"github.com/javiertlopez/awesome/controller"
 	"github.com/javiertlopez/awesome/repository/axiom"
@@ -45,12 +44,8 @@ func New(config AppConfig, logger *logrus.Logger) App {
 	// Set client options
 	clientOptions := options.Client().ApplyURI(config.MongoURI)
 
-	// Context with timeout for establish connection with Mongo Atlas
-	ctx, cancel := context.WithTimeout(context.Background(), mongoTimeout)
-	defer cancel()
-
 	// Connect to Mongo Atlas
-	client, err := mongo.Connect(ctx, clientOptions)
+	client, err := mongo.Connect(clientOptions)
 	if err != nil {
 		logger.Fatal(err)
 	}
