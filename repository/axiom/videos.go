@@ -83,7 +83,7 @@ func (v videos) GetByID(ctx context.Context, id string) (model.Video, error) {
 
 	collection := v.mongo.Collection(Collection)
 
-	filter := bson.M{"_id": id}
+	filter := bson.D{{Key: "_id", Value: id}}
 
 	err := collection.FindOne(ctx, filter).Decode(&response)
 

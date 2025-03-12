@@ -4,12 +4,14 @@ import (
 	"context"
 	"errors"
 	"io"
-	"reflect"
 	"testing"
 
+	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/javiertlopez/awesome/errorcodes"
 	"github.com/javiertlopez/awesome/model"
 	"github.com/javiertlopez/awesome/usecase/mocks"
-	"github.com/sirupsen/logrus"
 )
 
 // Generate mocks
@@ -31,41 +33,106 @@ func Test_delivery_GetByID(t *testing.T) {
 			},
 		},
 	}
+
 	type args struct {
 		ctx context.Context
 		id  string
 	}
+
+	type mockReturns struct {
+		assetResp model.Asset
+		assetErr  error
+		videoResp model.Video
+		videoErr  error
+	}
+
 	tests := []struct {
 		name    string
 		args    args
+		mocks   mockReturns
 		want    model.Video
 		wantErr bool
+		err     error
 	}{
 		{
-			"Only video",
-			args{
+			name: "Only video",
+			args: args{
 				ctx: context.Background(),
 				id:  uuid,
 			},
-			model.Video{},
-			false,
+			mocks: mockReturns{
+				assetResp: asset,
+				assetErr:  nil,
+				videoResp: model.Video{},
+				videoErr:  nil,
+			},
+			want:    model.Video{},
+			wantErr: false,
+			err:     nil,
 		},
 		{
-			"Error",
-			args{
+			name: "Asset service error",
+			args: args{
 				ctx: context.Background(),
 				id:  uuid,
 			},
-			model.Video{},
-			true,
+			mocks: mockReturns{
+				assetResp: model.Asset{},
+				assetErr:  errors.New("asset service failed"),
+				videoResp: model.Video{
+					Asset: &model.Asset{
+						ID: uuid,
+					},
+				},
+				videoErr: nil,
+			},
+			want: model.Video{
+				Asset: &model.Asset{
+					ID: uuid,
+				},
+			},
+			wantErr: false,
+			err:     nil,
 		},
 		{
-			"With asset",
-			args{
+			name: "Error",
+			args: args{
 				ctx: context.Background(),
 				id:  uuid,
 			},
-			model.Video{
+			mocks: mockReturns{
+				assetResp: asset,
+				assetErr:  nil,
+				videoResp: model.Video{},
+				videoErr:  errors.New("failed"),
+			},
+			want:    model.Video{},
+			wantErr: true,
+			err:     errors.New("failed"),
+		},
+		{
+			name: "With asset",
+			args: args{
+				ctx: context.Background(),
+				id:  uuid,
+			},
+			mocks: mockReturns{
+				assetResp: asset,
+				assetErr:  nil,
+				videoResp: model.Video{
+					ID:        uuid,
+					Poster:    "https://image.mux.com/5iNFJg9dIww2AgUryhgghbP00Dc4ogoxn00gzitOdjICg/thumbnail.png?width=1920\u0026height=1080\u0026smart_crop=true\u0026time=7",
+					Thumbnail: "https://image.mux.com/5iNFJg9dIww2AgUryhgghbP00Dc4ogoxn00gzitOdjICg/thumbnail.png?width=640\u0026height=360\u0026smart_crop=true\u0026time=7",
+					Sources: []model.Source{
+						{
+							Source: "https://stream.mux.com/5iNFJg9dIww2AgUryhgghbP00Dc4ogoxn00gzitOdjICg.m3u8",
+							Type:   "application/x-mpegURL",
+						},
+					},
+				},
+				videoErr: nil,
+			},
+			want: model.Video{
 				ID:        uuid,
 				Poster:    "https://image.mux.com/5iNFJg9dIww2AgUryhgghbP00Dc4ogoxn00gzitOdjICg/thumbnail.png?width=1920\u0026height=1080\u0026smart_crop=true\u0026time=7",
 				Thumbnail: "https://image.mux.com/5iNFJg9dIww2AgUryhgghbP00Dc4ogoxn00gzitOdjICg/thumbnail.png?width=640\u0026height=360\u0026smart_crop=true\u0026time=7",
@@ -76,9 +143,27 @@ func Test_delivery_GetByID(t *testing.T) {
 					},
 				},
 			},
-			false,
+			wantErr: false,
+			err:     nil,
+		},
+		{
+			name: "With invalid ID",
+			args: args{
+				ctx: context.Background(),
+				id:  "invalid",
+			},
+			mocks: mockReturns{
+				assetResp: asset,
+				assetErr:  nil,
+				videoResp: model.Video{},
+				videoErr:  nil,
+			},
+			want:    model.Video{},
+			wantErr: true,
+			err:     errorcodes.ErrInvalidID,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assets := &mocks.Assets{}
@@ -89,22 +174,18 @@ func Test_delivery_GetByID(t *testing.T) {
 				logger,
 			}
 
-			if tt.wantErr {
-				assets.On("GetByID", tt.args.ctx, tt.args.id).Return(model.Asset{}, errors.New("failed"))
-				videos.On("GetByID", tt.args.ctx, tt.args.id).Return(model.Video{}, errors.New("failed"))
-			} else {
-				assets.On("GetByID", tt.args.ctx, tt.args.id).Return(asset, nil)
-				videos.On("GetByID", tt.args.ctx, tt.args.id).Return(tt.want, nil)
-			}
+			assets.On("GetByID", tt.args.ctx, tt.args.id).Return(tt.mocks.assetResp, tt.mocks.assetErr)
+			videos.On("GetByID", tt.args.ctx, tt.args.id).Return(tt.mocks.videoResp, tt.mocks.videoErr)
 
 			got, err := usecase.GetByID(tt.args.ctx, tt.args.id)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("delivery.GetByID() error = %v, wantErr %v", err, tt.wantErr)
+			if tt.wantErr {
+				assert.Error(t, err)
+				assert.Equal(t, tt.err, err)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("delivery.GetByID() = %v, want %v", got, tt.want)
-			}
+
+			assert.NoError(t, err)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

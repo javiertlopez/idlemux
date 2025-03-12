@@ -3,8 +3,11 @@ package usecase
 import (
 	"context"
 
-	"github.com/javiertlopez/awesome/model"
+	guuid "github.com/google/uuid"
 	"github.com/sirupsen/logrus"
+
+	"github.com/javiertlopez/awesome/errorcodes"
+	"github.com/javiertlopez/awesome/model"
 )
 
 type delivery struct {
@@ -28,6 +31,11 @@ func Delivery(
 
 // GetByID methods
 func (u delivery) GetByID(ctx context.Context, id string) (model.Video, error) {
+	// Validate UUID format
+	if _, err := guuid.Parse(id); err != nil {
+		return model.Video{}, errorcodes.ErrInvalidID
+	}
+
 	response, err := u.videos.GetByID(ctx, id)
 
 	if err != nil {

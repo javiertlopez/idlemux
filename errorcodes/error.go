@@ -13,3 +13,6 @@ var ErrIngestionFailed = errors.New("ingestion failed")
 
 // ErrVideoUnprocessable definition
 var ErrVideoUnprocessable = errors.New("unprocessable Entity")
+
+// ErrInvalidID definition
+var ErrInvalidID = errors.New("invalid ID format")
