@@ -13,45 +13,14 @@ import (
 	"github.com/javiertlopez/awesome/model"
 )
 
-// assets struct
-type assets struct {
-	logger    *logrus.Logger
-	mux       *muxgo.APIClient
-	keyID     string
-	keySecret string
-	test      bool
-}
-
 // asset struct
 type asset struct {
 	data muxgo.Asset
 }
 
-// Config struct
-type Config struct {
-	KeyID     string
-	KeySecret string
-	Test      bool
-}
-
-// NewAsset returns an asset implementation (mux.com)
-func New(
-	l *logrus.Logger,
-	m *muxgo.APIClient,
-	cfg Config,
-) assets {
-	return assets{
-		logger:    l,
-		mux:       m,
-		keyID:     cfg.KeyID,
-		keySecret: cfg.KeySecret,
-		test:      cfg.Test,
-	}
-}
-
 // Ingest send a source file url to mux.com
 // Returns a string Asset ID
-func (a assets) Create(ctx context.Context, source string, public bool) (model.Asset, error) {
+func (a *Assets) Create(ctx context.Context, source string, public bool) (model.Asset, error) {
 	var policy []muxgo.PlaybackPolicy
 
 	if public {
@@ -86,7 +55,7 @@ func (a assets) Create(ctx context.Context, source string, public bool) (model.A
 }
 
 // GetByID retrieves an asset from Mux.com by Asset ID
-func (a assets) GetByID(ctx context.Context, id string) (model.Asset, error) {
+func (a *Assets) GetByID(ctx context.Context, id string) (model.Asset, error) {
 	response, err := a.mux.AssetsApi.GetAsset(id)
 
 	if err != nil {
@@ -186,7 +155,7 @@ func (a *asset) toModel() model.Asset {
 	}
 }
 
-func (a *assets) signURL(
+func (a *Assets) signURL(
 	playbackID string,
 	audience string,
 	duration float64,

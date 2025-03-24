@@ -1,10 +1,10 @@
-package axiom
+package mongodb
 
 import (
 	"context"
 	"time"
 
-	guuid "github.com/google/uuid"
+	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -23,36 +23,20 @@ type video struct {
 	Description string    `bson:"description"`
 	Duration    float64   `bson:"duration,omitempty"`
 	AssetID     string    `bson:"asset_id,omitempty"`
+	MasterID    string    `bson:"master_id,omitempty"`
 	CreatedAt   time.Time `bson:"createdAt"`
 	UpdatedAt   time.Time `bson:"updatedAt"`
 }
 
-// videos struct holds the logger and MongoDB client
-type videos struct {
-	mongo  *mongo.Database
-	logger *logrus.Logger
-}
-
-// NewVideoRepo method
-func New(
-	l *logrus.Logger,
-	m *mongo.Database,
-) *videos {
-	return &videos{
-		mongo:  m,
-		logger: l,
-	}
-}
-
 // Create video creates a new ID, stores the video and returns the new object
-func (v videos) Create(ctx context.Context, anyVideo model.Video) (model.Video, error) {
-	collection := v.mongo.Collection(Collection)
+func (db *DB) Create(ctx context.Context, anyVideo model.Video) (model.Video, error) {
+	collection := db.mongo.Collection(Collection)
 	time := time.Now()
 
-	uuid := guuid.New().String()
+	id := uuid.New().String()
 
 	insert := &video{
-		ID:          uuid,
+		ID:          id,
 		Title:       anyVideo.Title,
 		Description: anyVideo.Description,
 		CreatedAt:   time,
@@ -65,10 +49,10 @@ func (v videos) Create(ctx context.Context, anyVideo model.Video) (model.Video, 
 
 	_, err := collection.InsertOne(ctx, insert)
 	if err != nil {
-		v.logger.WithError(err).WithFields(logrus.Fields{
+		db.logger.WithFields(logrus.Fields{
 			"step": "collection.InsertOne",
 			"func": "func (v *videos) Insert",
-			"uuid": uuid,
+			"id":   id,
 		}).Error(err.Error())
 
 		return model.Video{}, err
@@ -78,17 +62,17 @@ func (v videos) Create(ctx context.Context, anyVideo model.Video) (model.Video, 
 }
 
 // GetByID retrieves a video with the ID
-func (v videos) GetByID(ctx context.Context, id string) (model.Video, error) {
+func (db *DB) GetByID(ctx context.Context, id string) (model.Video, error) {
 	var response video
 
-	collection := v.mongo.Collection(Collection)
+	collection := db.mongo.Collection(Collection)
 
 	filter := bson.D{{Key: "_id", Value: id}}
 
 	err := collection.FindOne(ctx, filter).Decode(&response)
 
 	if err != nil {
-		v.logger.WithFields(logrus.Fields{
+		db.logger.WithFields(logrus.Fields{
 			"step": "collection.FindOne",
 			"func": "func (v *videos) GetByID",
 			"id":   id,

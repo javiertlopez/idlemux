@@ -10,8 +10,8 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 
 	"github.com/javiertlopez/awesome/controller"
-	"github.com/javiertlopez/awesome/repository/axiom"
-	"github.com/javiertlopez/awesome/repository/muxinc"
+	"github.com/javiertlopez/awesome/mongodb"
+	"github.com/javiertlopez/awesome/muxinc"
 	"github.com/javiertlopez/awesome/router"
 	"github.com/javiertlopez/awesome/usecase"
 )
@@ -67,8 +67,8 @@ func New(config AppConfig, logger *logrus.Logger) App {
 		},
 	)
 
-	// Init axiom repository
-	videos := axiom.New(logger, db)
+	// Init mongodb repository
+	videos := mongodb.New(logger, db)
 
 	// Init delivery usecase
 	delivery := usecase.Delivery(assets, videos, logger)
