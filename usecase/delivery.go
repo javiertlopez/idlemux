@@ -3,7 +3,7 @@ package usecase
 import (
 	"context"
 
-	guuid "github.com/google/uuid"
+	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 
 	"github.com/javiertlopez/awesome/errorcodes"
@@ -32,13 +32,14 @@ func Delivery(
 // GetByID methods
 func (u delivery) GetByID(ctx context.Context, id string) (model.Video, error) {
 	// Validate UUID format
-	if _, err := guuid.Parse(id); err != nil {
+	if _, err := uuid.Parse(id); err != nil {
 		return model.Video{}, errorcodes.ErrInvalidID
 	}
 
 	response, err := u.videos.GetByID(ctx, id)
 
 	if err != nil {
+		u.logger.WithError(err).Error(err.Error())
 		return model.Video{}, err
 	}
 
@@ -46,7 +47,7 @@ func (u delivery) GetByID(ctx context.Context, id string) (model.Video, error) {
 	if response.Asset != nil {
 		asset, err := u.assets.GetByID(ctx, response.Asset.ID)
 		if err != nil {
-			u.logger.Error(err)
+			u.logger.WithError(err).Error(err.Error())
 			return response, nil
 		}
 

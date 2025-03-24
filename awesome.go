@@ -47,6 +47,7 @@ func New(config AppConfig, logger *logrus.Logger) App {
 	// Connect to Mongo Atlas
 	client, err := mongo.Connect(clientOptions)
 	if err != nil {
+		logger.WithError(err).Error(err.Error())
 		logger.Fatal(err)
 	}
 	db := client.Database(Database)
@@ -73,7 +74,7 @@ func New(config AppConfig, logger *logrus.Logger) App {
 	delivery := usecase.Delivery(assets, videos, logger)
 
 	// Init ingestion usecase
-	ingestion := usecase.Ingestion(assets, videos)
+	ingestion := usecase.Ingestion(assets, videos, logger)
 
 	// Init controller
 	controller := controller.New(config.Commit, config.Version, delivery, ingestion)

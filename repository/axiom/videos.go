@@ -65,7 +65,7 @@ func (v videos) Create(ctx context.Context, anyVideo model.Video) (model.Video, 
 
 	_, err := collection.InsertOne(ctx, insert)
 	if err != nil {
-		v.logger.WithFields(logrus.Fields{
+		v.logger.WithError(err).WithFields(logrus.Fields{
 			"step": "collection.InsertOne",
 			"func": "func (v *videos) Insert",
 			"uuid": uuid,

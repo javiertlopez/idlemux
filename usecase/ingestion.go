@@ -3,6 +3,8 @@ package usecase
 import (
 	"context"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/javiertlopez/awesome/errorcodes"
 	"github.com/javiertlopez/awesome/model"
 )
@@ -10,16 +12,19 @@ import (
 type ingestion struct {
 	assets Assets
 	videos Videos
+	logger *logrus.Logger
 }
 
 // Ingestion returns the usecase implementation
 func Ingestion(
 	a Assets,
 	v Videos,
+	l *logrus.Logger,
 ) ingestion {
 	return ingestion{
 		assets: a,
 		videos: v,
+		logger: l,
 	}
 }
 
@@ -43,14 +48,17 @@ func (u ingestion) Create(ctx context.Context, anyVideo model.Video) (model.Vide
 		}
 
 		asset, err := u.assets.Create(ctx, anyVideo.SourceURL, isPublic)
-		if err == nil {
-			anyVideo.Asset = &asset
+		if err != nil {
+			u.logger.WithError(err).Error(err.Error())
+			return model.Video{}, errorcodes.ErrIngestionFailed
 		}
+
+		anyVideo.Asset = &asset
 	}
 
 	response, err := u.videos.Create(ctx, anyVideo)
-
 	if err != nil {
+		u.logger.WithError(err).Error(err.Error())
 		return model.Video{}, err
 	}
 
