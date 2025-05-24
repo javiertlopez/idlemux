@@ -13,6 +13,7 @@ type Controller interface {
 
 	Create(w http.ResponseWriter, r *http.Request)
 	GetByID(w http.ResponseWriter, r *http.Request)
+	List(w http.ResponseWriter, r *http.Request)
 }
 
 // New returns a *mux.Router
@@ -26,6 +27,7 @@ func New(
 
 	router.HandleFunc("/videos", controller.Create).Methods("POST")
 	router.HandleFunc("/videos/{id}", controller.GetByID).Methods("GET")
+	router.HandleFunc("/videos", controller.List).Methods("GET")
 
 	return router
 }

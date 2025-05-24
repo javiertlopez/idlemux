@@ -9,6 +9,7 @@ import (
 // Delivery usecase
 type Delivery interface {
 	GetByID(ctx context.Context, id string) (model.Video, error)
+	List(ctx context.Context, page, limit int) ([]model.Video, error)
 }
 
 // Ingestion usecase

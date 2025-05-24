@@ -8,6 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 
 	"github.com/javiertlopez/awesome/errorcodes"
 	"github.com/javiertlopez/awesome/model"
@@ -86,6 +87,42 @@ func (db *DB) GetByID(ctx context.Context, id string) (model.Video, error) {
 	}
 
 	return response.toModel(), nil
+}
+
+// List returns paginated videos from the collection using page and limit parameters.
+func (db *DB) List(ctx context.Context, page, limit int) ([]model.Video, error) {
+	collection := db.mongo.Collection(Collection)
+	if page < 1 {
+		page = 1
+	}
+	if limit < 1 {
+		limit = 10
+	}
+	skip := int64((page - 1) * limit)
+	lim := int64(limit)
+	opts := options.Find().SetSkip(skip).SetLimit(lim).SetSort(bson.D{{Key: "createdAt", Value: 1}})
+	cur, err := collection.Find(ctx, bson.D{}, opts)
+	if err != nil {
+		db.logger.WithFields(logrus.Fields{
+			"step": "collection.Find",
+			"func": "func (db *DB) List",
+		}).Error(err.Error())
+		return nil, err
+	}
+	defer cur.Close(ctx)
+
+	var videos []model.Video
+	for cur.Next(ctx) {
+		var v video
+		if err := cur.Decode(&v); err != nil {
+			return nil, err
+		}
+		videos = append(videos, v.toModel())
+	}
+	if err := cur.Err(); err != nil {
+		return nil, err
+	}
+	return videos, nil
 }
 
 func (v video) toModel() model.Video {

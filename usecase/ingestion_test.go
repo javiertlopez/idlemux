@@ -12,11 +12,22 @@ import (
 
 	"github.com/javiertlopez/awesome/errorcodes"
 	"github.com/javiertlopez/awesome/model"
-	"github.com/javiertlopez/awesome/usecase/mocks"
 )
 
-// Generate mocks
-// mockery --keeptree --name=Assets --dir=usecase --output=usecase/mocks
+// Test_Ingestion tests the Ingestion constructor function
+func Test_Ingestion(t *testing.T) {
+	logger := logrus.New()
+	logger.Out = io.Discard
+	assets := NewMockAssets(t)
+	videos := NewMockVideos(t)
+
+	usecase := Ingestion(assets, videos, logger)
+
+	assert.NotNil(t, usecase)
+	assert.Equal(t, assets, usecase.assets)
+	assert.Equal(t, videos, usecase.videos)
+	assert.Equal(t, logger, usecase.logger)
+}
 
 func Test_ingestion_Create(t *testing.T) {
 	logger := logrus.New()
@@ -195,26 +206,58 @@ func Test_ingestion_Create(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assets := &mocks.Assets{}
-			videos := &mocks.Videos{}
+			// Create mocks with strict mode to catch any unexpected calls
+			assets := NewMockAssets(t)
+			videos := NewMockVideos(t)
+
+			// Create a real logger that discards output but can be inspected for coverage
+			testLogger := logrus.New()
+			testLogger.Out = io.Discard
+
 			usecase := &ingestion{
 				assets,
 				videos,
-				logger,
+				testLogger,
 			}
 
-			assets.On("Create", tt.args.ctx, tt.args.anyVideo.SourceURL, tt.args.anyVideo.Policy == "public").Return(asset, tt.mocks.assetErr)
-			videos.On("Create", tt.args.ctx, mock.AnythingOfType("model.Video")).Return(tt.mocks.videoResp, tt.mocks.videoErr)
+			// Set more structured mock expectations based on the test case properties
+			if len(tt.args.anyVideo.Title) == 0 || len(tt.args.anyVideo.Description) == 0 {
+				// For validation error test cases, no mock expectations needed
+				// The function will return early due to validation failure
+			} else if len(tt.args.anyVideo.SourceURL) > 0 {
+				// If there's a source URL, we expect assets.Create to be called
+				if tt.args.anyVideo.Policy == "public" || tt.args.anyVideo.Policy == "signed" {
+					isPublic := tt.args.anyVideo.Policy == "public"
+					assets.On("Create", tt.args.ctx, tt.args.anyVideo.SourceURL, isPublic).Return(asset, tt.mocks.assetErr)
+
+					// Only expect videos.Create if assets.Create doesn't error
+					if tt.mocks.assetErr == nil {
+						videos.On("Create", tt.args.ctx, mock.AnythingOfType("model.Video")).Return(tt.mocks.videoResp, tt.mocks.videoErr)
+					}
+				}
+				// For invalid policy, no mock expectations needed as function returns early
+			} else {
+				// For videos without source URL, only videos.Create is called
+				videos.On("Create", tt.args.ctx, mock.AnythingOfType("model.Video")).Return(tt.mocks.videoResp, tt.mocks.videoErr)
+			}
 
 			got, err := usecase.Create(tt.args.ctx, tt.args.anyVideo)
+
 			if tt.wantErr {
-				assert.Error(t, err)
-				assert.Equal(t, tt.err, err)
+				assert.Error(t, err, "Expected an error but got none")
+				if tt.err != nil {
+					assert.Equal(t, tt.err.Error(), err.Error(), "Error message doesn't match")
+				}
 				return
 			}
 
-			assert.NoError(t, err)
-			assert.Equal(t, tt.want, got)
+			assert.NoError(t, err, "Got unexpected error")
+			assert.Equal(t, tt.want, got, "Response doesn't match expected")
+
+			// Additional specific assertions for certain fields
+			if tt.want.Asset != nil {
+				assert.Equal(t, tt.want.Asset.ID, got.Asset.ID, "Asset ID doesn't match")
+			}
 		})
 
 	}

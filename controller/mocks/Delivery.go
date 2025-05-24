@@ -36,6 +36,15 @@ func (_m *Delivery) GetByID(ctx context.Context, id string) (model.Video, error)
 	return r0, r1
 }
 
+// List provides a mock function for the List method with pagination
+func (_m *Delivery) List(ctx context.Context, page, limit int) ([]model.Video, error) {
+	ret := _m.Called(ctx, page, limit)
+	if ret.Get(0) == nil {
+		return nil, ret.Error(1)
+	}
+	return ret.Get(0).([]model.Video), ret.Error(1)
+}
+
 type mockConstructorTestingTNewDelivery interface {
 	mock.TestingT
 	Cleanup(func())
