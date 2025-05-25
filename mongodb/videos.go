@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
@@ -50,11 +49,7 @@ func (db *DB) Create(ctx context.Context, anyVideo model.Video) (model.Video, er
 
 	_, err := collection.InsertOne(ctx, insert)
 	if err != nil {
-		db.logger.WithFields(logrus.Fields{
-			"step": "collection.InsertOne",
-			"func": "func (v *videos) Insert",
-			"id":   id,
-		}).Error(err.Error())
+		db.logger.WithError(err).Error("error inserting video into collection")
 
 		return model.Video{}, err
 	}
@@ -73,11 +68,7 @@ func (db *DB) GetByID(ctx context.Context, id string) (model.Video, error) {
 	err := collection.FindOne(ctx, filter).Decode(&response)
 
 	if err != nil {
-		db.logger.WithFields(logrus.Fields{
-			"step": "collection.FindOne",
-			"func": "func (v *videos) GetByID",
-			"id":   id,
-		}).Error(err.Error())
+		db.logger.WithError(err).Error("error getting video by ID")
 
 		if err == mongo.ErrNoDocuments {
 			return model.Video{}, errorcodes.ErrVideoNotFound
@@ -103,10 +94,8 @@ func (db *DB) List(ctx context.Context, page, limit int) ([]model.Video, error) 
 	opts := options.Find().SetSkip(skip).SetLimit(lim).SetSort(bson.D{{Key: "createdAt", Value: 1}})
 	cur, err := collection.Find(ctx, bson.D{}, opts)
 	if err != nil {
-		db.logger.WithFields(logrus.Fields{
-			"step": "collection.Find",
-			"func": "func (db *DB) List",
-		}).Error(err.Error())
+		db.logger.WithError(err).Error("error listing videos")
+
 		return nil, err
 	}
 	defer cur.Close(ctx)
