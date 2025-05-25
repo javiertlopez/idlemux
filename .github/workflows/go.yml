@@ -1,7 +1,10 @@
 name: Go
 permissions:
   contents: read
-  pull-requests: write
+  # Reduced from write to read since we're only running tests, not commenting on PRs
+  pull-requests: read
+  # For uploading code coverage results
+  checks: write
 
 on:
   push:
@@ -47,3 +50,10 @@ jobs:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
+
+      - name: Generate SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          format: spdx-json
+          artifact-name: sbom-${{ matrix.go }}-${{ github.run_id }}
+          output-file: sbom-${{ matrix.go }}.spdx.json

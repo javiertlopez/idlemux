@@ -3,12 +3,94 @@ info:
   title: Awesome library
   description:
     "A Video Library"
-  version: 0.6.1
+  version: 0.7.0
 tags:
   - name: videos
     description: Video collection
+  - name: app
+    description: Application status endpoints
 paths:
+  /app/healthz:
+    get:
+      tags:
+        - app
+      summary: Health check endpoint
+      description: Returns a simple health check response to verify the API is running
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              example:
+                message: "Hello World!"
+                status: 200
+                
+  /app/statusz:
+    get:
+      tags:
+        - app
+      summary: Status check endpoint
+      description: Returns information about the application version and commit
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  commit:
+                    type: string
+                  version:
+                    type: string
+              example:
+                commit: "2a4ca47"
+                version: "1.2.3"
+                
   /videos:
+    get:
+      tags:
+        - videos
+      summary: List videos
+      description: Returns a list of videos with pagination
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: limit
+          in: query
+          description: Maximum number of items per page
+          required: false
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Video"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              example:
+                message: "Internal server error"
+                status: 500
+    
     post:
       tags:
         - videos
@@ -37,41 +119,98 @@ paths:
       responses:
         201:
           description: Created
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Video"
         400:
           description: Bad request
-          content: {}
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              example:
+                message: "Bad request"
+                status: 400
         422:
           description: Unprocessable entity
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              example:
+                message: "Unprocessable entity"
+                status: 422
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              example:
+                message: "Internal server error"
+                status: 500
   /videos/{id}:
     get:
       tags:
         - videos
-      summary: Get a videoby ID
+      summary: Get a video by ID
       description: Returns a single video
       parameters:
         - name: id
           in: path
-          description: Video ID
+          description: Video ID (must be a 36-character UUID)
           required: true
           schema:
             type: string
+            format: uuid
+            minLength: 36
+            maxLength: 36
       responses:
         200:
-          description: successful operation
+          description: Successful operation
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Video"
         422:
           description: Invalid ID supplied
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              example:
+                message: "Unprocessable Entity"
+                status: 422
         404:
           description: Video not found
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              example:
+                message: "Not found"
+                status: 404
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              example:
+                message: "Internal server error"
+                status: 500
 components:
   schemas:
+    Response:
+      type: object
+      properties:
+        message:
+          type: string
+        status:
+          type: integer
+          format: int32
+          
     Video:
       type: object
       properties:
@@ -81,12 +220,19 @@ components:
           type: string
         description:
           type: string
+        source_url:
+          type: string
+          format: uri
         duration:
           type: number
           format: float
         poster:
           type: string
+          format: uri
         thumbnail:
+          type: string
+          format: uri
+        policy:
           type: string
         asset:
           $ref: '#/components/schemas/Asset'
@@ -96,19 +242,52 @@ components:
             $ref: '#/components/schemas/Source'
         created_at:
           type: string
-          format: date_time
+          format: date-time
         updated_at:
           type: string
-          format: date_time
+          format: date-time
+    
     Asset:
       type: object
       properties:
         id:
           type: string
+        url:
+          type: string
+          format: uri
+        created_at:
+          type: string
+          format: date-time
+        status:
+          type: string
+        duration:
+          type: number
+          format: float
+        max_stored_resolution:
+          type: string
+        max_stored_frame_rate:
+          type: number
+          format: float
+        aspect_ratio:
+          type: string
+        passthrough:
+          type: string
+        poster:
+          type: string
+          format: uri
+        thumbnail:
+          type: string
+          format: uri
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/Source'
+    
     Source:
       type: object
       properties:
         src:
           type: string
+          format: uri
         type:
           type: string

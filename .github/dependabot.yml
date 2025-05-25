@@ -1,0 +1,27 @@
+version: 2
+updates:
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    # Assign pull requests to specific reviewers
+    assignees:
+      - "javiertlopez"
+    # Labels on pull requests for GitHub Actions dependencies
+    labels:
+      - "dependencies"
+      - "actions"
+
+  # Maintain dependencies for Go
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "javiertlopez"
+    labels:
+      - "dependencies"
+      - "go"
+    # Setup vulnerability alerts for Go dependencies
+    open-pull-requests-limit: 10
