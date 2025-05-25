@@ -77,7 +77,7 @@ func (a *assets) GetByID(ctx context.Context, id string) (model.Asset, error) {
 		playbackID := body.data.PlaybackIds[0].Id
 		policy := body.data.PlaybackIds[0].Policy
 
-		if err := a.enrichAssetWithURLs(playbackID, policy, asset.Duration, &asset); err != nil {
+		if err := a.hydrateAssetURLs(playbackID, policy, asset.Duration, &asset); err != nil {
 			a.logger.WithError(err).Error("error generating asset URLs")
 
 			return model.Asset{}, err
@@ -87,8 +87,8 @@ func (a *assets) GetByID(ctx context.Context, id string) (model.Asset, error) {
 	return asset, nil
 }
 
-// enrichAssetWithURLs adds source, poster, and thumbnail URLs to the asset
-func (a *assets) enrichAssetWithURLs(playbackID string, policy muxgo.PlaybackPolicy, duration float64, asset *model.Asset) error {
+// hydrateAssetURLs adds source, poster, and thumbnail URLs to the asset
+func (a *assets) hydrateAssetURLs(playbackID string, policy muxgo.PlaybackPolicy, duration float64, asset *model.Asset) error {
 	var source, poster, thumbnail string
 	var err error
 
