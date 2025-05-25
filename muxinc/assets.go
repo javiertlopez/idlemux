@@ -8,9 +8,17 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	muxgo "github.com/muxinc/mux-go/v5"
-	"github.com/sirupsen/logrus"
 
 	"github.com/javiertlopez/idlemux/model"
+)
+
+// Constants for image dimensions
+const (
+	posterWidth     = 1920
+	posterHeight    = 1080
+	thumbnailWidth  = 640
+	thumbnailHeight = 360
+	imageTime       = "7"
 )
 
 // asset struct
@@ -20,7 +28,7 @@ type asset struct {
 
 // Ingest send a source file url to mux.com
 // Returns a string Asset ID
-func (a *Assets) Create(ctx context.Context, source string, public bool) (model.Asset, error) {
+func (a *assets) Create(ctx context.Context, source string, public bool) (model.Asset, error) {
 	var policy []muxgo.PlaybackPolicy
 
 	if public {
@@ -40,11 +48,7 @@ func (a *Assets) Create(ctx context.Context, source string, public bool) (model.
 	})
 
 	if err != nil {
-		a.logger.WithFields(logrus.Fields{
-			"step":   "AssetsApi.CreateAsset",
-			"func":   "Create",
-			"source": source,
-		}).Error(err.Error())
+		a.logger.WithError(err).Error("error creating asset")
 
 		return model.Asset{}, err
 	}
@@ -55,10 +59,11 @@ func (a *Assets) Create(ctx context.Context, source string, public bool) (model.
 }
 
 // GetByID retrieves an asset from Mux.com by Asset ID
-func (a *Assets) GetByID(ctx context.Context, id string) (model.Asset, error) {
+func (a *assets) GetByID(ctx context.Context, id string) (model.Asset, error) {
 	response, err := a.mux.AssetsApi.GetAsset(id)
-
 	if err != nil {
+		a.logger.WithError(err).Error("error retrieving asset by ID")
+
 		return model.Asset{}, err
 	}
 
@@ -69,77 +74,111 @@ func (a *Assets) GetByID(ctx context.Context, id string) (model.Asset, error) {
 	asset := body.toModel()
 
 	if len(body.data.PlaybackIds) > 0 {
-		var source, poster, thumbnail string
 		playbackID := body.data.PlaybackIds[0].Id
+		policy := body.data.PlaybackIds[0].Policy
 
-		switch body.data.PlaybackIds[0].Policy {
-		case muxgo.PUBLIC:
-			source = fmt.Sprintf(
-				"https://stream.mux.com/%s.m3u8",
-				playbackID,
-			)
+		if err := a.hydrateAssetURLs(playbackID, policy, asset.Duration, &asset); err != nil {
+			a.logger.WithError(err).Error("error generating asset URLs")
 
-			poster = fmt.Sprintf(
-				"https://image.mux.com/%s/thumbnail.png?width=%s&height=%s&smart_crop=true&time=%s",
-				playbackID,
-				"1920",
-				"1080",
-				"7",
-			)
-
-			thumbnail = fmt.Sprintf(
-				"https://image.mux.com/%s/thumbnail.png?width=%s&height=%s&smart_crop=true&time=%s",
-				playbackID,
-				"640",
-				"360",
-				"7",
-			)
-		case muxgo.SIGNED:
-			token, err := a.signURL(playbackID, "v", asset.Duration, 0, 0)
-			if err != nil {
-				return model.Asset{}, err
-			}
-
-			source = fmt.Sprintf(
-				"https://stream.mux.com/%s.m3u8?token=%s",
-				playbackID,
-				token,
-			)
-
-			token, err = a.signURL(playbackID, "t", asset.Duration, 1920, 1080)
-			if err != nil {
-				return model.Asset{}, err
-			}
-
-			poster = fmt.Sprintf(
-				"https://image.mux.com/%s/thumbnail.png?token=%s",
-				playbackID,
-				token,
-			)
-
-			token, err = a.signURL(playbackID, "t", asset.Duration, 640, 360)
-			if err != nil {
-				return model.Asset{}, err
-			}
-
-			thumbnail = fmt.Sprintf(
-				"https://image.mux.com/%s/thumbnail.png?token=%s",
-				playbackID,
-				token,
-			)
-		}
-
-		asset.Poster = poster
-		asset.Thumbnail = thumbnail
-		asset.Sources = []model.Source{
-			{
-				Source: source,
-				Type:   "application/x-mpegURL",
-			},
+			return model.Asset{}, err
 		}
 	}
 
 	return asset, nil
+}
+
+// hydrateAssetURLs adds source, poster, and thumbnail URLs to the asset
+func (a *assets) hydrateAssetURLs(playbackID string, policy muxgo.PlaybackPolicy, duration float64, asset *model.Asset) error {
+	var source, poster, thumbnail string
+	var err error
+
+	switch policy {
+	case muxgo.PUBLIC:
+		source, poster, thumbnail = a.generatePublicURLs(playbackID)
+	case muxgo.SIGNED:
+		source, poster, thumbnail, err = a.generateSignedURLs(playbackID, duration)
+		if err != nil {
+			return err
+		}
+	}
+
+	asset.Poster = poster
+	asset.Thumbnail = thumbnail
+	asset.Sources = []model.Source{
+		{
+			Source: source,
+			Type:   "application/x-mpegURL",
+		},
+	}
+
+	return nil
+}
+
+// generatePublicURLs creates public URLs for the asset
+func (a *assets) generatePublicURLs(playbackID string) (source, poster, thumbnail string) {
+	source = fmt.Sprintf(
+		"https://stream.mux.com/%s.m3u8",
+		playbackID,
+	)
+
+	poster = fmt.Sprintf(
+		"https://image.mux.com/%s/thumbnail.png?width=%d&height=%d&smart_crop=true&time=%s",
+		playbackID,
+		posterWidth,
+		posterHeight,
+		imageTime,
+	)
+
+	thumbnail = fmt.Sprintf(
+		"https://image.mux.com/%s/thumbnail.png?width=%d&height=%d&smart_crop=true&time=%s",
+		playbackID,
+		thumbnailWidth,
+		thumbnailHeight,
+		imageTime,
+	)
+
+	return source, poster, thumbnail
+}
+
+// generateSignedURLs creates signed URLs for the asset
+func (a *assets) generateSignedURLs(playbackID string, duration float64) (source, poster, thumbnail string, err error) {
+	// Generate video token
+	videoToken, err := a.signURL(playbackID, "v", duration, 0, 0)
+	if err != nil {
+		return "", "", "", fmt.Errorf("error signing URL for video playback: %w", err)
+	}
+
+	// Generate poster token
+	posterToken, err := a.signURL(playbackID, "t", duration, posterWidth, posterHeight)
+	if err != nil {
+		return "", "", "", fmt.Errorf("error signing URL for poster: %w", err)
+	}
+
+	// Generate thumbnail token
+	thumbnailToken, err := a.signURL(playbackID, "t", duration, thumbnailWidth, thumbnailHeight)
+	if err != nil {
+		return "", "", "", fmt.Errorf("error signing URL for thumbnail: %w", err)
+	}
+
+	source = fmt.Sprintf(
+		"https://stream.mux.com/%s.m3u8?token=%s",
+		playbackID,
+		videoToken,
+	)
+
+	poster = fmt.Sprintf(
+		"https://image.mux.com/%s/thumbnail.png?token=%s",
+		playbackID,
+		posterToken,
+	)
+
+	thumbnail = fmt.Sprintf(
+		"https://image.mux.com/%s/thumbnail.png?token=%s",
+		playbackID,
+		thumbnailToken,
+	)
+
+	return source, poster, thumbnail, nil
 }
 
 func (a *asset) toModel() model.Asset {
@@ -155,7 +194,7 @@ func (a *asset) toModel() model.Asset {
 	}
 }
 
-func (a *Assets) signURL(
+func (a *assets) signURL(
 	playbackID string,
 	audience string,
 	duration float64,

@@ -187,4 +187,4 @@ go build -ldflags="-X 'main.version=v0.7.0' -X 'main.commit=$(git rev-parse --sh
 
 ## License
 
-Licensed under [MIT License](LICENSE). © 2024 Hiram Torres Lopez.
+Licensed under [MIT License](LICENSE). © 2025 Hiram Torres Lopez.

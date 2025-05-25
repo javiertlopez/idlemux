@@ -6,7 +6,7 @@ import (
 )
 
 // Assets struct
-type Assets struct {
+type assets struct {
 	logger    *logrus.Logger
 	mux       *muxgo.APIClient
 	keyID     string
@@ -26,8 +26,8 @@ func New(
 	l *logrus.Logger,
 	m *muxgo.APIClient,
 	cfg Config,
-) *Assets {
-	return &Assets{
+) *assets {
+	return &assets{
 		logger:    l,
 		mux:       m,
 		keyID:     cfg.KeyID,
