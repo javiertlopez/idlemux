@@ -1,4 +1,4 @@
-module github.com/javiertlopez/awesome
+module github.com/javiertlopez/idlemux
 
 go 1.24
 

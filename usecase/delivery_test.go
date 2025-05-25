@@ -9,8 +9,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/javiertlopez/awesome/errorcodes"
-	"github.com/javiertlopez/awesome/model"
+	"github.com/javiertlopez/idlemux/errorcodes"
+	"github.com/javiertlopez/idlemux/model"
 )
 
 // Test_Delivery tests the Delivery constructor function

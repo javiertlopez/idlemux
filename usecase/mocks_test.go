@@ -7,7 +7,7 @@ package usecase
 import (
 	"context"
 
-	"github.com/javiertlopez/awesome/model"
+	"github.com/javiertlopez/idlemux/model"
 	mock "github.com/stretchr/testify/mock"
 )
 

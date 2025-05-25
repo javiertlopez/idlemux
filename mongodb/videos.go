@@ -10,8 +10,8 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 
-	"github.com/javiertlopez/awesome/errorcodes"
-	"github.com/javiertlopez/awesome/model"
+	"github.com/javiertlopez/idlemux/errorcodes"
+	"github.com/javiertlopez/idlemux/model"
 )
 
 // Collection keeps the collection name

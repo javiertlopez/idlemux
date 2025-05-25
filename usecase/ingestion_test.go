@@ -10,8 +10,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/javiertlopez/awesome/errorcodes"
-	"github.com/javiertlopez/awesome/model"
+	"github.com/javiertlopez/idlemux/errorcodes"
+	"github.com/javiertlopez/idlemux/model"
 )
 
 // Test_Ingestion tests the Ingestion constructor function

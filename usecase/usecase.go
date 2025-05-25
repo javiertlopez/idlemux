@@ -3,7 +3,7 @@ package usecase
 import (
 	"context"
 
-	"github.com/javiertlopez/awesome/model"
+	"github.com/javiertlopez/idlemux/model"
 )
 
 // Assets interface

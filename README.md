@@ -1,15 +1,15 @@
-# awesome
+# idlemux
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/javiertlopez/awesome.svg)](https://pkg.go.dev/github.com/javiertlopez/awesome)
-[![Go Report Card](https://goreportcard.com/badge/github.com/javiertlopez/awesome)](https://goreportcard.com/report/github.com/javiertlopez/awesome)
-[![Go](https://github.com/javiertlopez/awesome/workflows/Go/badge.svg)](https://github.com/javiertlopez/awesome/actions)
-[![codecov](https://codecov.io/gh/javiertlopez/awesome/branch/main/graph/badge.svg?token=I8D2Z4TZX4)](https://codecov.io/gh/javiertlopez/awesome)
-[![Go Version](https://img.shields.io/github/go-mod/go-version/javiertlopez/awesome)](https://github.com/javiertlopez/awesome/blob/main/go.mod)
-[![MIT License](https://img.shields.io/github/license/javiertlopez/awesome)](https://github.com/javiertlopez/awesome/blob/main/LICENSE)
+[![Go Reference](https://pkg.go.dev/badge/github.com/javiertlopez/idlemux.svg)](https://pkg.go.dev/github.com/javiertlopez/idlemux)
+[![Go Report Card](https://goreportcard.com/badge/github.com/javiertlopez/idlemux)](https://goreportcard.com/report/github.com/javiertlopez/idlemux)
+[![Go](https://github.com/javiertlopez/idlemux/workflows/Go/badge.svg)](https://github.com/javiertlopez/idlemux/actions)
+[![codecov](https://codecov.io/gh/javiertlopez/idlemux/branch/main/graph/badge.svg?token=I8D2Z4TZX4)](https://codecov.io/gh/javiertlopez/idlemux)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/javiertlopez/idlemux)](https://github.com/javiertlopez/idlemux/blob/main/go.mod)
+[![MIT License](https://img.shields.io/github/license/javiertlopez/idlemux)](https://github.com/javiertlopez/idlemux/blob/main/LICENSE)
 
 ## Overview
 
-Awesome is a REST API that stores a Video Library in MongoDB Atlas and uses Mux.com for video processing and delivery. It provides endpoints for creating, retrieving, and listing videos with a clean and consistent API design.
+IdleMux is a REST API that stores a Video Library in MongoDB Atlas and uses Mux.com for video processing and delivery. It provides endpoints for creating, retrieving, and listing videos with a clean and consistent API design.
 
 ## Features
 
@@ -73,7 +73,7 @@ The API is documented using OpenAPI 3.0.1. You can find the specification in the
 Install as a dependency:
 
 ```bash
-go get github.com/javiertlopez/awesome
+go get github.com/javiertlopez/idlemux
 ```
 
 ### Example
@@ -86,7 +86,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/javiertlopez/awesome"
+	"github.com/javiertlopez/idlemux"
 
 	"github.com/sirupsen/logrus"
 )
@@ -98,7 +98,7 @@ const (
 )
 
 var (
-	application awesome.App
+	application idlemux.App
 	commit      string // Set during build with -ldflags
 	version     string // Set during build with -ldflags
 )
@@ -119,8 +119,8 @@ func main() {
 	logger := logrus.New()
 	logger.Formatter = &logrus.JSONFormatter{}
 
-	application = awesome.New(
-		awesome.AppConfig{
+	application = idlemux.New(
+		idlemux.AppConfig{
 			Commit:         commit,
 			Version:        version,
 			MongoURI:       mongoString,
@@ -166,7 +166,7 @@ This project is tested against the latest two Go versions (currently 1.23 and 1.
 To inject version and commit information during build:
 
 ```bash
-go build -ldflags="-X 'main.version=v0.7.0' -X 'main.commit=$(git rev-parse --short HEAD)'" -o awesome
+go build -ldflags="-X 'main.version=v0.7.0' -X 'main.commit=$(git rev-parse --short HEAD)'" -o idlemux
 ```
 
 ### Adding API Endpoints

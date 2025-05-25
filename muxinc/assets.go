@@ -10,7 +10,7 @@ import (
 	muxgo "github.com/muxinc/mux-go/v5"
 	"github.com/sirupsen/logrus"
 
-	"github.com/javiertlopez/awesome/model"
+	"github.com/javiertlopez/idlemux/model"
 )
 
 // asset struct

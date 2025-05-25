@@ -17,7 +17,6 @@ github.com/gorilla/mux v1.8.1 h1:TuBL49tXwgrFYWhqrNgrUNEY92u81SPhu7sTdzQEiWY=
 github.com/gorilla/mux v1.8.1/go.mod h1:AKf9I4AEqPTmMytcMc0KkNouC66V3BtZ4qD5fmWSiMQ=
 github.com/klauspost/compress v1.18.0 h1:c/Cqfb0r+Yi+JtIEq73FWXVkRonBlf0CRNYc8Zttxdo=
 github.com/klauspost/compress v1.18.0/go.mod h1:2Pp+KzxcywXVXMr50+X0Q/Lsb43OQHYWRCY2AiWywWQ=
-github.com/muxinc/mux-go v1.1.1 h1:EFCT8hvv2sIcl7zUMoFYVSUMsjJjXs8CjhCNd+46a2I=
 github.com/muxinc/mux-go v1.1.1/go.mod h1:WbikcZUvuLazzfQv+454Nibb/VSEpTy1lsRCwdTQ+X0=
 github.com/muxinc/mux-go/v5 v5.9.0 h1:DgZOA4CNgDrAuXeyaOoYz/Xlt9bZ0dxTL/fuokyeB90=
 github.com/muxinc/mux-go/v5 v5.9.0/go.mod h1:Myr5B5cBz3LdjYyf3PyVet+LRDOFUeKE/RKHjHQQx5E=

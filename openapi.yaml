@@ -1,6 +1,6 @@
 openapi: 3.0.1
 info:
-  title: Awesome library
+  title: idlemux library
   description:
     "A Video Library"
   version: 0.7.0

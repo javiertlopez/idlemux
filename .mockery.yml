@@ -11,9 +11,9 @@ require-template-schema-exists: true
 template: testify
 template-schema: '{{.Template}}.schema.json'
 packages:
-  github.com/javiertlopez/awesome/usecase:
+  github.com/javiertlopez/idlemux/usecase:
     config:
       all: true
-  github.com/javiertlopez/awesome/controller:
+  github.com/javiertlopez/idlemux/controller:
     config:
       all: true

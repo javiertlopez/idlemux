@@ -1,4 +1,4 @@
-package awesome
+package idlemux
 
 import (
 	"time"
@@ -9,11 +9,11 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 
-	"github.com/javiertlopez/awesome/controller"
-	"github.com/javiertlopez/awesome/mongodb"
-	"github.com/javiertlopez/awesome/muxinc"
-	"github.com/javiertlopez/awesome/router"
-	"github.com/javiertlopez/awesome/usecase"
+	"github.com/javiertlopez/idlemux/controller"
+	"github.com/javiertlopez/idlemux/mongodb"
+	"github.com/javiertlopez/idlemux/muxinc"
+	"github.com/javiertlopez/idlemux/router"
+	"github.com/javiertlopez/idlemux/usecase"
 )
 
 const (

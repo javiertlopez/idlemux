@@ -3,7 +3,7 @@ package controller
 import (
 	"context"
 
-	"github.com/javiertlopez/awesome/model"
+	"github.com/javiertlopez/idlemux/model"
 )
 
 // Delivery usecase

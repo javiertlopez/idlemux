@@ -5,8 +5,8 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/javiertlopez/awesome/errorcodes"
-	"github.com/javiertlopez/awesome/model"
+	"github.com/javiertlopez/idlemux/errorcodes"
+	"github.com/javiertlopez/idlemux/model"
 )
 
 type ingestion struct {
