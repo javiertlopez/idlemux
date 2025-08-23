@@ -28,6 +28,10 @@ jobs:
         with:
           go-version: ${{ matrix.go }}
 
+      - name: Fix the Go toolchain
+        # https://github.com/golang/go/issues/75031
+        run: go env -w GOTOOLCHAIN=go${{ matrix.go }}+auto
+
       - name: Get dependencies
         run: |
           go get -v -t -d ./...
