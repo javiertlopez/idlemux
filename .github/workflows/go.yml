@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: ["1.23", "1.24"]
+        go: ["1.24", "1.25"]
     name: Go ${{ matrix.go }} build
     steps:
       - name: Checkout
@@ -27,6 +27,10 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go }}
+
+      - name: Fix the Go toolchain
+        # https://github.com/golang/go/issues/75031
+        run: go env -w GOTOOLCHAIN=go${{ matrix.go }}.0+auto
 
       - name: Get dependencies
         run: |
