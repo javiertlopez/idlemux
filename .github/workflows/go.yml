@@ -30,7 +30,7 @@ jobs:
 
       - name: Fix the Go toolchain
         # https://github.com/golang/go/issues/75031
-        run: go env -w GOTOOLCHAIN=go${{ matrix.go }}+auto
+        run: go env -w GOTOOLCHAIN=go${{ matrix.go }}.0+auto
 
       - name: Get dependencies
         run: |
