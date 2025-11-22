@@ -28,3 +28,8 @@ packages:
       Ingestion:
         config:
           filename: mocks_test.go
+  github.com/javiertlopez/idlemux/router:
+    interfaces:
+      Controller:
+        config:
+          filename: mocks_test.go
