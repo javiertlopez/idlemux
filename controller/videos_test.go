@@ -16,7 +16,7 @@ import (
 	"github.com/javiertlopez/idlemux/model"
 )
 
-func Test_videoController_Create(t *testing.T) {
+func TestVideoController_Create(t *testing.T) {
 	completeVideo := model.Video{
 		Title:       "Some Might Say",
 		Description: "(What's the Story) Morning Glory?",
@@ -91,7 +91,7 @@ func Test_videoController_Create(t *testing.T) {
 	}
 }
 
-func Test_videoController_GetByID(t *testing.T) {
+func TestVideoController_GetByID(t *testing.T) {
 	uuid := "4e5bf8f2-9c50-4576-b9d4-1d1fd0705885"
 	completeVideo := model.Video{
 		ID:          uuid,
@@ -171,7 +171,7 @@ func Test_videoController_GetByID(t *testing.T) {
 	}
 }
 
-func Test_videoController_List(t *testing.T) {
+func TestVideoController_List(t *testing.T) {
 	videos := []model.Video{
 		{ID: "id1", Title: "Video 1"},
 		{ID: "id2", Title: "Video 2"},

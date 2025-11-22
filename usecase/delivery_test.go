@@ -13,8 +13,8 @@ import (
 	"github.com/javiertlopez/idlemux/model"
 )
 
-// Test_Delivery tests the Delivery constructor function
-func Test_Delivery(t *testing.T) {
+// TestDelivery tests the Delivery constructor function
+func TestDelivery(t *testing.T) {
 	logger := logrus.New()
 	logger.Out = io.Discard
 	assets := NewMockAssets(t)
@@ -28,7 +28,7 @@ func Test_Delivery(t *testing.T) {
 	assert.Equal(t, logger, usecase.logger)
 }
 
-func Test_delivery_GetByID(t *testing.T) {
+func TestDelivery_GetByID(t *testing.T) {
 	logger := logrus.New()
 	logger.Out = io.Discard
 
@@ -258,7 +258,7 @@ func Test_delivery_GetByID(t *testing.T) {
 	}
 }
 
-func Test_delivery_List(t *testing.T) {
+func TestDelivery_List(t *testing.T) {
 	logger := logrus.New()
 	logger.Out = io.Discard
 

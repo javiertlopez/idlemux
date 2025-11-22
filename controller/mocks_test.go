@@ -70,15 +70,26 @@ type MockDelivery_GetByID_Call struct {
 }
 
 // GetByID is a helper method to define mock.On call
-//   - ctx
-//   - id
+//   - ctx context.Context
+//   - id string
 func (_e *MockDelivery_Expecter) GetByID(ctx interface{}, id interface{}) *MockDelivery_GetByID_Call {
 	return &MockDelivery_GetByID_Call{Call: _e.mock.On("GetByID", ctx, id)}
 }
 
 func (_c *MockDelivery_GetByID_Call) Run(run func(ctx context.Context, id string)) *MockDelivery_GetByID_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -127,16 +138,32 @@ type MockDelivery_List_Call struct {
 }
 
 // List is a helper method to define mock.On call
-//   - ctx
-//   - page
-//   - limit
+//   - ctx context.Context
+//   - page int
+//   - limit int
 func (_e *MockDelivery_Expecter) List(ctx interface{}, page interface{}, limit interface{}) *MockDelivery_List_Call {
 	return &MockDelivery_List_Call{Call: _e.mock.On("List", ctx, page, limit)}
 }
 
 func (_c *MockDelivery_List_Call) Run(run func(ctx context.Context, page int, limit int)) *MockDelivery_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(int), args[2].(int))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 int
+		if args[1] != nil {
+			arg1 = args[1].(int)
+		}
+		var arg2 int
+		if args[2] != nil {
+			arg2 = args[2].(int)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
 	})
 	return _c
 }
@@ -210,15 +237,26 @@ type MockIngestion_Create_Call struct {
 }
 
 // Create is a helper method to define mock.On call
-//   - ctx
-//   - anyVideo
+//   - ctx context.Context
+//   - anyVideo model.Video
 func (_e *MockIngestion_Expecter) Create(ctx interface{}, anyVideo interface{}) *MockIngestion_Create_Call {
 	return &MockIngestion_Create_Call{Call: _e.mock.On("Create", ctx, anyVideo)}
 }
 
 func (_c *MockIngestion_Create_Call) Run(run func(ctx context.Context, anyVideo model.Video)) *MockIngestion_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.Video))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.Video
+		if args[1] != nil {
+			arg1 = args[1].(model.Video)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }

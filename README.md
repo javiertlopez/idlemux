@@ -9,21 +9,21 @@
 
 ## Overview
 
-IdleMux is a REST API that stores a Video Library in MongoDB Atlas and uses Mux.com for video processing and delivery. It provides endpoints for creating, retrieving, and listing videos with a clean and consistent API design.
+IdleMux is a REST API that stores a Video Library in MongoDB Atlas and uses Mux.com for video processing and delivery. It provides endpoints for creating, retrieving, and listing videos.
 
 ## Features
 
 - Video management (create, get by ID, list with pagination)
 - Video ingestion through Mux.com
 - Health check and application status endpoints
-- Well-documented API with OpenAPI 3.0.1 specification
-- Comprehensive test suite with high code coverage
+- OpenAPI 3.0.1 specification
+- Test suite with high code coverage
 
 ## Getting started
 
 ### Prerequisites
 
-- Go 1.23 or 1.24 (we test against the latest two Go versions)
+- Go 1.25 or later
 - MongoDB Atlas account
 - Mux.com account with API credentials
 
@@ -159,7 +159,7 @@ func main() {
 
 ### Go Version Compatibility
 
-This project is tested against the latest two Go versions (currently 1.23 and 1.24). We use GitHub Actions to ensure compatibility with these versions.
+This project requires Go 1.25 or later. We use GitHub Actions to test against supported Go versions.
 
 ### Building with Version Information
 
