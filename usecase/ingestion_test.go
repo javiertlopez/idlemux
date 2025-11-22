@@ -14,8 +14,8 @@ import (
 	"github.com/javiertlopez/idlemux/model"
 )
 
-// Test_Ingestion tests the Ingestion constructor function
-func Test_Ingestion(t *testing.T) {
+// TestIngestion tests the Ingestion constructor function
+func TestIngestion(t *testing.T) {
 	logger := logrus.New()
 	logger.Out = io.Discard
 	assets := NewMockAssets(t)
@@ -29,7 +29,7 @@ func Test_Ingestion(t *testing.T) {
 	assert.Equal(t, logger, usecase.logger)
 }
 
-func Test_ingestion_Create(t *testing.T) {
+func TestIngestion_Create(t *testing.T) {
 	logger := logrus.New()
 	logger.Out = io.Discard
 

@@ -3,8 +3,9 @@ dir: '{{.InterfaceDir}}'
 filename: mocks_test.go
 force-file-write: true
 formatter: goimports
+include-auto-generated: false
 log-level: info
-structname: '{{.Mock}}{{.InterfaceName}}'
+structname: 'Mock{{.InterfaceName}}'
 pkgname: '{{.SrcPackageName}}'
 recursive: false
 require-template-schema-exists: true
@@ -12,8 +13,18 @@ template: testify
 template-schema: '{{.Template}}.schema.json'
 packages:
   github.com/javiertlopez/idlemux/usecase:
-    config:
-      all: true
+    interfaces:
+      Videos:
+        config:
+          filename: mocks_test.go
+      Assets:
+        config:
+          filename: mocks_test.go
   github.com/javiertlopez/idlemux/controller:
-    config:
-      all: true
+    interfaces:
+      Delivery:
+        config:
+          filename: mocks_test.go
+      Ingestion:
+        config:
+          filename: mocks_test.go

@@ -70,16 +70,32 @@ type MockAssets_Create_Call struct {
 }
 
 // Create is a helper method to define mock.On call
-//   - ctx
-//   - source
-//   - public
+//   - ctx context.Context
+//   - source string
+//   - public bool
 func (_e *MockAssets_Expecter) Create(ctx interface{}, source interface{}, public interface{}) *MockAssets_Create_Call {
 	return &MockAssets_Create_Call{Call: _e.mock.On("Create", ctx, source, public)}
 }
 
 func (_c *MockAssets_Create_Call) Run(run func(ctx context.Context, source string, public bool)) *MockAssets_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].(bool))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		var arg2 bool
+		if args[2] != nil {
+			arg2 = args[2].(bool)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
 	})
 	return _c
 }
@@ -126,15 +142,26 @@ type MockAssets_GetByID_Call struct {
 }
 
 // GetByID is a helper method to define mock.On call
-//   - ctx
-//   - id
+//   - ctx context.Context
+//   - id string
 func (_e *MockAssets_Expecter) GetByID(ctx interface{}, id interface{}) *MockAssets_GetByID_Call {
 	return &MockAssets_GetByID_Call{Call: _e.mock.On("GetByID", ctx, id)}
 }
 
 func (_c *MockAssets_GetByID_Call) Run(run func(ctx context.Context, id string)) *MockAssets_GetByID_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -208,15 +235,26 @@ type MockVideos_Create_Call struct {
 }
 
 // Create is a helper method to define mock.On call
-//   - ctx
-//   - anyVideo
+//   - ctx context.Context
+//   - anyVideo model.Video
 func (_e *MockVideos_Expecter) Create(ctx interface{}, anyVideo interface{}) *MockVideos_Create_Call {
 	return &MockVideos_Create_Call{Call: _e.mock.On("Create", ctx, anyVideo)}
 }
 
 func (_c *MockVideos_Create_Call) Run(run func(ctx context.Context, anyVideo model.Video)) *MockVideos_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.Video))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.Video
+		if args[1] != nil {
+			arg1 = args[1].(model.Video)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -263,15 +301,26 @@ type MockVideos_GetByID_Call struct {
 }
 
 // GetByID is a helper method to define mock.On call
-//   - ctx
-//   - id
+//   - ctx context.Context
+//   - id string
 func (_e *MockVideos_Expecter) GetByID(ctx interface{}, id interface{}) *MockVideos_GetByID_Call {
 	return &MockVideos_GetByID_Call{Call: _e.mock.On("GetByID", ctx, id)}
 }
 
 func (_c *MockVideos_GetByID_Call) Run(run func(ctx context.Context, id string)) *MockVideos_GetByID_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -320,16 +369,32 @@ type MockVideos_List_Call struct {
 }
 
 // List is a helper method to define mock.On call
-//   - ctx
-//   - page
-//   - limit
+//   - ctx context.Context
+//   - page int
+//   - limit int
 func (_e *MockVideos_Expecter) List(ctx interface{}, page interface{}, limit interface{}) *MockVideos_List_Call {
 	return &MockVideos_List_Call{Call: _e.mock.On("List", ctx, page, limit)}
 }
 
 func (_c *MockVideos_List_Call) Run(run func(ctx context.Context, page int, limit int)) *MockVideos_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(int), args[2].(int))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 int
+		if args[1] != nil {
+			arg1 = args[1].(int)
+		}
+		var arg2 int
+		if args[2] != nil {
+			arg2 = args[2].(int)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
 	})
 	return _c
 }
