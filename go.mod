@@ -9,7 +9,7 @@ require (
 	github.com/muxinc/mux-go/v5 v5.9.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.11.1
-	go.mongodb.org/mongo-driver/v2 v2.4.0
+	go.mongodb.org/mongo-driver/v2 v2.4.1
 )
 
 require (
